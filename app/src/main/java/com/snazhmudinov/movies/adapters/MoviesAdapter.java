@@ -7,16 +7,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
-
 import com.snazhmudinov.movies.R;
 import com.snazhmudinov.movies.activities.MovieActivity;
 import com.snazhmudinov.movies.constans.Constants;
 import com.snazhmudinov.movies.models.Movie;
 import com.squareup.picasso.Picasso;
-
+import org.parceler.Parcels;
 import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -72,8 +69,10 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolde
 
         @OnClick(R.id.poster)
         void openMovieDetails() {
-            //Launch second activity -> pass movie from the list to be displayed
+            Movie movie = moviesList.get(getAdapterPosition());
+
             Intent intent = new Intent(context, MovieActivity.class);
+            intent.putExtra(Constants.MOVIE_KEY, Parcels.wrap(movie));
             context.startActivity(intent);
         }
     }

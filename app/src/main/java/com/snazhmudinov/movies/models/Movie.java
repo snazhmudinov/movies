@@ -1,64 +1,42 @@
 package com.snazhmudinov.movies.models;
 
 import com.google.gson.annotations.SerializedName;
-
+import org.parceler.Parcel;
 import java.util.ArrayList;
 import java.util.List;
 
+@Parcel
 public class Movie {
     @SerializedName("poster_path")
-    private String posterPath;
+    public String posterPath;
     @SerializedName("adult")
-    private boolean adult;
+    public boolean adult;
     @SerializedName("overview")
-    private String overview;
+    public String overview;
     @SerializedName("release_date")
-    private String releaseDate;
+    public String releaseDate;
     @SerializedName("genre_ids")
-    private List<Integer> genreIds = new ArrayList<Integer>();
+    public List<Integer> genreIds = new ArrayList<Integer>();
     @SerializedName("id")
-    private Integer id;
+    public Integer id;
     @SerializedName("original_title")
-    private String originalTitle;
+    public String originalTitle;
     @SerializedName("original_language")
-    private String originalLanguage;
+    public String originalLanguage;
     @SerializedName("title")
-    private String title;
+    public String title;
     @SerializedName("backdrop_path")
-    private String backdropPath;
+    public String backdropPath;
     @SerializedName("popularity")
-    private Double popularity;
+    public Double popularity;
     @SerializedName("vote_count")
-    private Integer voteCount;
+    public Integer voteCount;
     @SerializedName("video")
-    private Boolean video;
+    public Boolean video;
     @SerializedName("vote_average")
-    private Double voteAverage;
-/*
-    public abstract String getPosterPath();
-    public abstract boolean isAdult();
-    public abstract String getOverview();
-    public abstract String getReleaseDate();
-    public abstract List<Integer> getGenreIds();
-    public abstract Integer getId();
-    public abstract String getOriginalTitle();
-    public abstract String getOriginalLanguage();
-    public abstract String getTitle();
-    public abstract String getBackdropPath();
-    public abstract Double getPopularity();
-    public abstract Integer getVoteCount();
-    public abstract boolean isVideo();
-    public abstract Double getVoteAverage();
+    public Double voteAverage;
 
-    public static Movie create(String posterPath, boolean adult, String overview, String releaseDate,
-                        List<Integer> genreIds, Integer id, String originalTitle,
-                        String originalLanguage, String title, String backdropPath,
-                        Double popularity, Integer voteCount, Boolean video, Double voteAverage) {
-
-        return new AutoValue_Movie(posterPath, adult, overview, releaseDate, genreIds, id,
-                               originalTitle, originalLanguage, title, backdropPath, popularity,
-                               voteCount, video, voteAverage);
-    }*/
+    public Movie() {}
 
     public Movie(String posterPath, boolean adult, String overview, String releaseDate, List<Integer> genreIds, Integer id,
                  String originalTitle, String originalLanguage, String title, String backdropPath, Double popularity,

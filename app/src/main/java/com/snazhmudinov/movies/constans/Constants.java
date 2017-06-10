@@ -16,4 +16,6 @@ public final class Constants {
     public static final String POSTER_BASE_URL = "http://image.tmdb.org/t/p/w500//";
 
     public static final String MOVIE_KEY = "MOVIE_KEY";
+
+    public static final String YOUTUBE_API_KEY = "AIzaSyDUqvEbxRrZEr2azhE90Wm3UO_ZDxDjHzA";
 }

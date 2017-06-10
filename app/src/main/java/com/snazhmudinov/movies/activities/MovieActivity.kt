@@ -14,6 +14,9 @@ import org.parceler.Parcels
  */
 
 class MovieActivity : AppCompatActivity() {
+
+    var mIsAdded = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_movie)
@@ -21,6 +24,11 @@ class MovieActivity : AppCompatActivity() {
         val movie : Movie = Parcels.unwrap(intent.getParcelableExtra(Constants.MOVIE_KEY))
 
         configureToolbar()
+        configureFab()
+        fab.setOnClickListener {
+            mIsAdded = !mIsAdded
+            configureFab()
+        }
 
         toolbar_layout.title = movie.originalTitle
         Picasso.with(this)
@@ -33,5 +41,10 @@ class MovieActivity : AppCompatActivity() {
         movie_toolbar.setNavigationOnClickListener {
             finish()
         }
+    }
+
+    fun configureFab() {
+        val resId =  if(mIsAdded) R.drawable.ic_clear else R.drawable.ic_add
+        fab.setImageResource(resId)
     }
 }

@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Movies</string>
+
+    <!-- Error messages -->
+    <string name="unsuccessful_response">Couldn\'t parse response</string>
+    <string name="error_call">Error making a network call</string>
+    <string name="title_activity_movie">MovieActivity</string>
+</resources>

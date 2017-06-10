@@ -1,39 +1,42 @@
 package com.snazhmudinov.movies.models;
 
 import com.google.gson.annotations.SerializedName;
-
+import org.parceler.Parcel;
 import java.util.ArrayList;
 import java.util.List;
 
+@Parcel
 public class Movie {
     @SerializedName("poster_path")
-    private String posterPath;
+    public String posterPath;
     @SerializedName("adult")
-    private boolean adult;
+    public boolean adult;
     @SerializedName("overview")
-    private String overview;
+    public String overview;
     @SerializedName("release_date")
-    private String releaseDate;
+    public String releaseDate;
     @SerializedName("genre_ids")
-    private List<Integer> genreIds = new ArrayList<Integer>();
+    public List<Integer> genreIds = new ArrayList<Integer>();
     @SerializedName("id")
-    private Integer id;
+    public Integer id;
     @SerializedName("original_title")
-    private String originalTitle;
+    public String originalTitle;
     @SerializedName("original_language")
-    private String originalLanguage;
+    public String originalLanguage;
     @SerializedName("title")
-    private String title;
+    public String title;
     @SerializedName("backdrop_path")
-    private String backdropPath;
+    public String backdropPath;
     @SerializedName("popularity")
-    private Double popularity;
+    public Double popularity;
     @SerializedName("vote_count")
-    private Integer voteCount;
+    public Integer voteCount;
     @SerializedName("video")
-    private Boolean video;
+    public Boolean video;
     @SerializedName("vote_average")
-    private Double voteAverage;
+    public Double voteAverage;
+
+    public Movie() {}
 
     public Movie(String posterPath, boolean adult, String overview, String releaseDate, List<Integer> genreIds, Integer id,
                  String originalTitle, String originalLanguage, String title, String backdropPath, Double popularity,

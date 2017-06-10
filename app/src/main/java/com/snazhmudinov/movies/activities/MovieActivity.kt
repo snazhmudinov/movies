@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity
 import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.constans.Constants
 import com.snazhmudinov.movies.models.Movie
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_movie.*
 import org.parceler.Parcels
 
@@ -13,7 +14,6 @@ import org.parceler.Parcels
  */
 
 class MovieActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_movie)
@@ -23,6 +23,9 @@ class MovieActivity : AppCompatActivity() {
         configureToolbar()
 
         toolbar_layout.title = movie.originalTitle
+        Picasso.with(this)
+                .load(Constants.POSTER_BASE_URL + movie.posterPath)
+                .into(poster_container)
     }
 
     fun configureToolbar() {

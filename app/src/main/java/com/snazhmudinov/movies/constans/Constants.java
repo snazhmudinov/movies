@@ -14,4 +14,6 @@ public final class Constants {
 
     //Poster - base URL, w500 = width equals 500(px?)
     public static final String POSTER_BASE_URL = "http://image.tmdb.org/t/p/w500//";
+
+    public static final String MOVIE_KEY = "MOVIE_KEY";
 }

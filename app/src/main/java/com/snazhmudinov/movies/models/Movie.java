@@ -34,31 +34,6 @@ public class Movie {
     private Boolean video;
     @SerializedName("vote_average")
     private Double voteAverage;
-/*
-    public abstract String getPosterPath();
-    public abstract boolean isAdult();
-    public abstract String getOverview();
-    public abstract String getReleaseDate();
-    public abstract List<Integer> getGenreIds();
-    public abstract Integer getId();
-    public abstract String getOriginalTitle();
-    public abstract String getOriginalLanguage();
-    public abstract String getTitle();
-    public abstract String getBackdropPath();
-    public abstract Double getPopularity();
-    public abstract Integer getVoteCount();
-    public abstract boolean isVideo();
-    public abstract Double getVoteAverage();
-
-    public static Movie create(String posterPath, boolean adult, String overview, String releaseDate,
-                        List<Integer> genreIds, Integer id, String originalTitle,
-                        String originalLanguage, String title, String backdropPath,
-                        Double popularity, Integer voteCount, Boolean video, Double voteAverage) {
-
-        return new AutoValue_Movie(posterPath, adult, overview, releaseDate, genreIds, id,
-                               originalTitle, originalLanguage, title, backdropPath, popularity,
-                               voteCount, video, voteAverage);
-    }*/
 
     public Movie(String posterPath, boolean adult, String overview, String releaseDate, List<Integer> genreIds, Integer id,
                  String originalTitle, String originalLanguage, String title, String backdropPath, Double popularity,

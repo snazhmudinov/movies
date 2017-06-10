@@ -22,7 +22,7 @@ class MovieActivity : AppCompatActivity() {
 
         configureToolbar()
 
-        movie_toolbar.title = movie.originalTitle
+        toolbar_layout.title = movie.originalTitle
     }
 
     fun configureToolbar() {

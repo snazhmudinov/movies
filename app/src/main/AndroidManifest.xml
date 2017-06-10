@@ -19,7 +19,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.MovieActivity" />
+        <activity android:name=".activities.MovieActivity"
+                  android:theme="@style/MoviesTheme"/>
     </application>
 
 </manifest>

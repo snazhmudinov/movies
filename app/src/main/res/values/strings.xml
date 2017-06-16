@@ -4,6 +4,10 @@
     <!-- Error messages -->
     <string name="unsuccessful_response">Couldn\'t parse response</string>
     <string name="error_call">Error making a network call</string>
+
     <string name="title_activity_movie">MovieActivity</string>
     <string name="movie_toolbar_title">Movie</string>
+
+    <string name="added_to_favorites">Added to favorites</string>
+    <string name="undo">Undo</string>
 </resources>

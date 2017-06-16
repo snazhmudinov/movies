@@ -1,5 +1,6 @@
 package com.snazhmudinov.movies.components;
 
+import com.snazhmudinov.movies.activities.MovieActivity;
 import com.snazhmudinov.movies.activities.MovieListActivity;
 import com.snazhmudinov.movies.modules.NetworkModule;
 
@@ -14,4 +15,5 @@ import dagger.Component;
 @Component(modules = {NetworkModule.class})
 public interface NetworkComponents {
     void inject(MovieListActivity object);
+    void inject(MovieActivity object);
 }

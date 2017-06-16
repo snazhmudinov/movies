@@ -10,24 +10,37 @@
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/app_bar_height"
+        android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
         android:theme="@style/MoviesTheme.AppBarOverlay">
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/toolbar_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="350dp"
             android:fitsSystemWindows="true"
-            android:background="@color/colorPrimary"
             app:contentScrim="@color/colorPrimary"
+            app:expandedTitleTextAppearance="@android:color/transparent"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+            <ImageView
+                android:id="@+id/poster_container"
+                android:layout_width="match_parent"
+                android:layout_height="350dp"
+                android:scrollY="-134dp"
+                android:scaleType="centerCrop"/>
+
+            <ImageView
+                android:id="@+id/trailer_icon"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                app:srcCompat="@drawable/ic_play_circle"
+                android:layout_gravity="center"/>
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/movie_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="@color/colorPrimary"
                 app:navigationIcon="@drawable/ic_arrow_back"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/MoviesTheme.PopupOverlay" />
@@ -37,13 +50,12 @@
 
     <include layout="@layout/movie_content" />
 
-<!--    <android.support.design.widget.FloatingActionButton
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
         app:layout_anchor="@id/app_bar"
-        app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@android:drawable/ic_dialog_email" />-->
+        app:layout_anchorGravity="bottom|end" />
 
 </android.support.design.widget.CoordinatorLayout>

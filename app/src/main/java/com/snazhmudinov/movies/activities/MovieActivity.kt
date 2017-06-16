@@ -3,6 +3,7 @@ package com.snazhmudinov.movies.activities
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
 import com.snazhmudinov.movies.R
@@ -43,6 +44,7 @@ class MovieActivity : AppCompatActivity() {
         configureFab()
 
         fab.setOnClickListener {
+            displaySnackbar()
             mIsAdded = !mIsAdded
             configureFab()
         }
@@ -55,6 +57,16 @@ class MovieActivity : AppCompatActivity() {
         Picasso.with(this)
                 .load(Constants.POSTER_BASE_URL + movie.posterPath)
                 .into(poster_container)
+    }
+
+    fun displaySnackbar() {
+        val mSnackbar = if (!mIsAdded)
+            Snackbar.make(parent_view, R.string.added_to_favorites, Snackbar.LENGTH_LONG) else null
+        mSnackbar?.setAction(R.string.undo, {
+            mIsAdded = false
+            configureFab()
+        })
+        mSnackbar?.show()
     }
 
     fun configureToolbar() {

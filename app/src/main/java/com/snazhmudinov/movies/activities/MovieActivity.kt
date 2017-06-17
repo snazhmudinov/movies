@@ -113,7 +113,7 @@ class MovieActivity : AppCompatActivity() {
         call.enqueue(object : retrofit2.Callback<CastList> {
             override fun onResponse(call: Call<CastList>?, response: Response<CastList>) {
                 if (response.isSuccessful) {
-                    TODO("Populate some UI -> horizontal recyclerview with photos/names")
+                    //TODO - Populate some UI -> horizontal recyclerview with photos/names
                 } else {
                     errorToast(R.string.unsuccessful_response)
                 }

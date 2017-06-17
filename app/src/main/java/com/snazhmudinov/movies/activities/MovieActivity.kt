@@ -10,6 +10,7 @@ import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.application.MovieApplication
 import com.snazhmudinov.movies.constans.Constants
 import com.snazhmudinov.movies.endpoints.MoviesEndPointsInterface
+import com.snazhmudinov.movies.models.CastList
 import com.snazhmudinov.movies.models.Movie
 import com.snazhmudinov.movies.models.Trailer
 import com.squareup.picasso.Picasso
@@ -57,6 +58,8 @@ class MovieActivity : AppCompatActivity() {
         Picasso.with(this)
                 .load(Constants.POSTER_BASE_URL + movie.posterPath)
                 .into(poster_container)
+
+        getCast(movie)
     }
 
     fun displaySnackbar() {
@@ -97,6 +100,25 @@ class MovieActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<Trailer>, t: Throwable) {
+                Toast.makeText(this@MovieActivity, R.string.error_call, Toast.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    fun getCast(movie : Movie) {
+        val service = mRetrofit.create(MoviesEndPointsInterface::class.java)
+        val call = service.getCastList(movie.id.toString(), Constants.API_KEY)
+
+        call.enqueue(object : retrofit2.Callback<CastList> {
+            override fun onResponse(call: Call<CastList>?, response: Response<CastList>) {
+                if (response.isSuccessful) {
+                    TODO("Populate some UI -> horizontal recyclerview with photos/names")
+                } else {
+                    Toast.makeText(this@MovieActivity, R.string.unsuccessful_response, Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            override fun onFailure(call: Call<CastList>?, t: Throwable?) {
                 Toast.makeText(this@MovieActivity, R.string.error_call, Toast.LENGTH_SHORT).show()
             }
         })

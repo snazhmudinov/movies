@@ -119,7 +119,7 @@ class MovieActivity : AppCompatActivity() {
 
                     if (responseResults?.isNotEmpty() as Boolean) {
                         responseResults.let {
-                            val url = it[0]?.getKey()
+                            val url = it[0]?.trailerURL
                             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
                         }
                     } else {

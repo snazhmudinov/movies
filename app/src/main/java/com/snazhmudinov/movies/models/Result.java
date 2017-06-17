@@ -41,7 +41,7 @@ public class Result {
         return iso31661;
     }
 
-    public String getKey() {
+    public String getTrailerURL() {
         return Constants.YOUTUBE_BASE_URL + key;
     }
 

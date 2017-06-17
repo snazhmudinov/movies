@@ -14,14 +14,17 @@
         android:orientation="vertical">
 
         <TextView
-            android:layout_width="match_parent"
+            android:id="@+id/actors_drop_down"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/actors_title"
             android:textSize="22sp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp"/>
+            android:layout_marginEnd="5dp"
+            android:drawableRight="@drawable/ic_arrow_drop_up"
+            android:drawableTint="@color/default_gray"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/cast_recycler_view"

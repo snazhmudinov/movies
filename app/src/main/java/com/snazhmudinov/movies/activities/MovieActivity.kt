@@ -1,5 +1,6 @@
 package com.snazhmudinov.movies.activities
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -95,12 +96,12 @@ class MovieActivity : AppCompatActivity() {
 
                     startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
                 } else {
-                    Toast.makeText(this@MovieActivity, R.string.unsuccessful_response, Toast.LENGTH_SHORT).show()
+                    errorToast(R.string.unsuccessful_response)
                 }
             }
 
             override fun onFailure(call: Call<Trailer>, t: Throwable) {
-                Toast.makeText(this@MovieActivity, R.string.error_call, Toast.LENGTH_SHORT).show()
+                errorToast(R.string.error_call)
             }
         })
     }
@@ -114,13 +115,16 @@ class MovieActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     TODO("Populate some UI -> horizontal recyclerview with photos/names")
                 } else {
-                    Toast.makeText(this@MovieActivity, R.string.unsuccessful_response, Toast.LENGTH_SHORT).show()
+                    errorToast(R.string.unsuccessful_response)
                 }
             }
 
             override fun onFailure(call: Call<CastList>?, t: Throwable?) {
-                Toast.makeText(this@MovieActivity, R.string.error_call, Toast.LENGTH_SHORT).show()
+                errorToast(R.string.error_call)
             }
         })
     }
+
+    fun Context.errorToast(message : Int)  { Toast.makeText(this, message, Toast.LENGTH_SHORT).show() }
+
 }

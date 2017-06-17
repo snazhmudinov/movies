@@ -1,6 +1,7 @@
 package com.snazhmudinov.movies.models
 
 import com.google.gson.annotations.SerializedName
+import com.snazhmudinov.movies.constans.Constants
 
 /**
  * Created by snazhmudinov on 6/17/17.
@@ -20,7 +21,7 @@ class Cast constructor(castId:String, character:String, creditId:String, gender:
     @SerializedName("gender")
     var gender : String? = null
         get()  {
-            return if (gender.equals("2")) "Male" else "Female"
+            return if (field.equals("2")) "Male" else "Female"
         }
 
     @SerializedName("id")
@@ -34,4 +35,5 @@ class Cast constructor(castId:String, character:String, creditId:String, gender:
 
     @SerializedName("profile_path")
     var profilePath : String? = null
+        get() = Constants.POSTER_BASE_URL + field
 }

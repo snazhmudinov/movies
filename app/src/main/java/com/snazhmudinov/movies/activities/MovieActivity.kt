@@ -135,8 +135,11 @@ class MovieActivity : AppCompatActivity() {
         call.enqueue(object : retrofit2.Callback<CastList> {
             override fun onResponse(call: Call<CastList>?, response: Response<CastList>) {
                 if (response.isSuccessful) {
-                    val actors = response.body()?.castList?.subList(0, 5)
-                    actors?.let { setupMovieCast(it) }
+                    val actors = response.body()?.castList
+                    if (actors?.isNotEmpty() as Boolean) {
+                        actors.let { setupMovieCast(it.subList(0, 5)) }
+                    }
+
                 } else {
                     errorToast(R.string.unsuccessful_response)
                 }

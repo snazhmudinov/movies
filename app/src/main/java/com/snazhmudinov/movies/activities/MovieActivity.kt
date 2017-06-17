@@ -1,5 +1,6 @@
 package com.snazhmudinov.movies.activities
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -10,6 +11,7 @@ import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.application.MovieApplication
 import com.snazhmudinov.movies.constans.Constants
 import com.snazhmudinov.movies.endpoints.MoviesEndPointsInterface
+import com.snazhmudinov.movies.models.CastList
 import com.snazhmudinov.movies.models.Movie
 import com.snazhmudinov.movies.models.Trailer
 import com.squareup.picasso.Picasso
@@ -57,6 +59,8 @@ class MovieActivity : AppCompatActivity() {
         Picasso.with(this)
                 .load(Constants.POSTER_BASE_URL + movie.posterPath)
                 .into(poster_container)
+
+        getCast(movie)
     }
 
     fun displaySnackbar() {
@@ -92,13 +96,35 @@ class MovieActivity : AppCompatActivity() {
 
                     startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
                 } else {
-                    Toast.makeText(this@MovieActivity, R.string.unsuccessful_response, Toast.LENGTH_SHORT).show()
+                    errorToast(R.string.unsuccessful_response)
                 }
             }
 
             override fun onFailure(call: Call<Trailer>, t: Throwable) {
-                Toast.makeText(this@MovieActivity, R.string.error_call, Toast.LENGTH_SHORT).show()
+                errorToast(R.string.error_call)
             }
         })
     }
+
+    fun getCast(movie : Movie) {
+        val service = mRetrofit.create(MoviesEndPointsInterface::class.java)
+        val call = service.getCastList(movie.id.toString(), Constants.API_KEY)
+
+        call.enqueue(object : retrofit2.Callback<CastList> {
+            override fun onResponse(call: Call<CastList>?, response: Response<CastList>) {
+                if (response.isSuccessful) {
+                    //TODO - Populate some UI -> horizontal recyclerview with photos/names
+                } else {
+                    errorToast(R.string.unsuccessful_response)
+                }
+            }
+
+            override fun onFailure(call: Call<CastList>?, t: Throwable?) {
+                errorToast(R.string.error_call)
+            }
+        })
+    }
+
+    fun Context.errorToast(message : Int)  { Toast.makeText(this, message, Toast.LENGTH_SHORT).show() }
+
 }

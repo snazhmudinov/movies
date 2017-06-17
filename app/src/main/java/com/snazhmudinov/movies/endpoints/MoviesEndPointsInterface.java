@@ -1,6 +1,6 @@
 package com.snazhmudinov.movies.endpoints;
 
-import com.snazhmudinov.movies.constans.Constants;
+import com.snazhmudinov.movies.models.CastList;
 import com.snazhmudinov.movies.models.MovieResponse;
 import com.snazhmudinov.movies.models.Trailer;
 
@@ -20,4 +20,7 @@ public interface MoviesEndPointsInterface {
 
     @GET("{id}/videos")
     Call<Trailer> getYouTubeTrailer(@Path("id") String id, @Query("api_key") String apiKey);
+
+    @GET("{id}/credits")
+    Call<CastList> getCastList(@Path("id") String id, @Query("api_key") String apiKey);
 }

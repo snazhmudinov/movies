@@ -7,16 +7,20 @@ import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.widget.ImageView
+import android.support.v7.widget.LinearLayoutManager
 import android.widget.Toast
 import com.snazhmudinov.movies.R
+import com.snazhmudinov.movies.adapters.CastAdapter
 import com.snazhmudinov.movies.application.MovieApplication
 import com.snazhmudinov.movies.constans.Constants
 import com.snazhmudinov.movies.endpoints.MoviesEndPointsInterface
+import com.snazhmudinov.movies.models.Cast
 import com.snazhmudinov.movies.models.CastList
 import com.snazhmudinov.movies.models.Movie
 import com.snazhmudinov.movies.models.Trailer
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_movie.*
+import kotlinx.android.synthetic.main.movie_content.*
 import org.parceler.Parcels
 import retrofit2.Call
 import retrofit2.Response
@@ -65,6 +69,12 @@ class MovieActivity : AppCompatActivity() {
         getCast(movie)
     }
 
+    fun setupMovieCast(castList : List<Cast>) {
+        cast_recycler_view.layoutManager = LinearLayoutManager(this)
+        val castAdapter = CastAdapter(castList, this)
+        cast_recycler_view.adapter = castAdapter
+    }
+
     fun displaySnackbar() {
         val mSnackbar = if (!mIsAdded)
             Snackbar.make(parent_view, R.string.added_to_favorites, Snackbar.LENGTH_LONG) else null
@@ -95,7 +105,6 @@ class MovieActivity : AppCompatActivity() {
             override fun onResponse(call: Call<Trailer>, response: Response<Trailer>) {
                 if (response.isSuccessful) {
                     val url = Constants.YOUTUBE_BASE_URL + response.body()?.results?.get(0)?.key
-
                     startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
                 } else {
                     errorToast(R.string.unsuccessful_response)
@@ -115,7 +124,8 @@ class MovieActivity : AppCompatActivity() {
         call.enqueue(object : retrofit2.Callback<CastList> {
             override fun onResponse(call: Call<CastList>?, response: Response<CastList>) {
                 if (response.isSuccessful) {
-                    //TODO - Populate some UI -> horizontal recyclerview with photos/names
+                    val actors = response.body()?.castList?.subList(0, 5)
+                    actors?.let { setupMovieCast(it) }
                 } else {
                     errorToast(R.string.unsuccessful_response)
                 }

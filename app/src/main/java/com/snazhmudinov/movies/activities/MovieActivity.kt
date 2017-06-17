@@ -115,8 +115,17 @@ class MovieActivity : AppCompatActivity() {
         call.enqueue(object : retrofit2.Callback<Trailer> {
             override fun onResponse(call: Call<Trailer>, response: Response<Trailer>) {
                 if (response.isSuccessful) {
-                    val url = Constants.YOUTUBE_BASE_URL + response.body()?.results?.get(0)?.key
-                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                    val responseResults = response.body()?.results
+
+                    if (responseResults?.isNotEmpty() as Boolean) {
+                        responseResults.let {
+                            val url = it[0]?.getKey()
+                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                        }
+                    } else {
+                        errorToast(R.string.no_trailer_error)
+                    }
+
                 } else {
                     errorToast(R.string.unsuccessful_response)
                 }

@@ -8,6 +8,8 @@ import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.widget.ImageView
 import android.support.v7.widget.LinearLayoutManager
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.Toast
 import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.adapters.CastAdapter
@@ -58,6 +60,15 @@ class MovieActivity : AppCompatActivity() {
 
         trailer_icon.setOnClickListener {
             playTrailer(movie)
+        }
+
+        actors_drop_down.setOnClickListener {
+            val visibility = cast_recycler_view.visibility
+            cast_recycler_view.visibility = if (visibility == VISIBLE) GONE else VISIBLE
+
+            val drawable = if (cast_recycler_view.visibility == VISIBLE) R.drawable.ic_arrow_drop_up
+                                else R.drawable.ic_arrow_drop_down
+            actors_drop_down.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawable, 0)
         }
 
         toolbar_layout.title = movie.originalTitle

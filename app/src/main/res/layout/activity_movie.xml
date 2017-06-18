@@ -28,8 +28,7 @@
                 android:id="@+id/poster_container"
                 android:layout_width="match_parent"
                 android:layout_height="350dp"
-                android:scrollY="-134dp"
-                android:scaleType="centerCrop"/>
+                android:scaleType="matrix"/>
 
             <ImageView
                 android:id="@+id/trailer_icon"

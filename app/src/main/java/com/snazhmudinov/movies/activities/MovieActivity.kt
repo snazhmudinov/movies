@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
+import android.widget.ImageView
 import android.widget.Toast
 import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.application.MovieApplication
@@ -59,6 +60,7 @@ class MovieActivity : AppCompatActivity() {
         Picasso.with(this)
                 .load(Constants.POSTER_BASE_URL + movie.posterPath)
                 .into(poster_container)
+        poster_container.cropToTop()
 
         getCast(movie)
     }
@@ -127,4 +129,13 @@ class MovieActivity : AppCompatActivity() {
 
     fun Context.errorToast(message : Int)  { Toast.makeText(this, message, Toast.LENGTH_SHORT).show() }
 
+    fun ImageView.cropToTop() {
+        val matrix = this.matrix
+        val scaleRatioWidth = resources.displayMetrics.widthPixels / this.drawable.intrinsicWidth
+        val scaleRatioHeight = resources.displayMetrics.heightPixels / this.drawable.intrinsicHeight
+
+        val scaleFactor = if (scaleRatioWidth > scaleRatioHeight) scaleRatioWidth else scaleRatioHeight
+        matrix.postScale(scaleFactor.toFloat() * 1.1F, scaleFactor.toFloat() * 1.1F)
+        this.imageMatrix = matrix
+    }
 }

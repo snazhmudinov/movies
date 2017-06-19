@@ -1,6 +1,7 @@
 package com.snazhmudinov.movies.models;
 
 import com.google.gson.annotations.SerializedName;
+import com.snazhmudinov.movies.constans.Constants;
 
 import org.parceler.Parcel;
 
@@ -40,8 +41,8 @@ public class Result {
         return iso31661;
     }
 
-    public String getKey() {
-        return key;
+    public String getTrailerURL() {
+        return Constants.YOUTUBE_BASE_URL + key;
     }
 
     public String getName() {

@@ -2,11 +2,11 @@ package com.snazhmudinov.movies.activities
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.PointF
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
-import android.widget.ImageView
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View.GONE
 import android.view.View.VISIBLE
@@ -20,7 +20,6 @@ import com.snazhmudinov.movies.models.Cast
 import com.snazhmudinov.movies.models.CastList
 import com.snazhmudinov.movies.models.Movie
 import com.snazhmudinov.movies.models.Trailer
-import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_movie.*
 import kotlinx.android.synthetic.main.movie_content.*
 import org.parceler.Parcels
@@ -72,11 +71,8 @@ class MovieActivity : AppCompatActivity() {
         }
 
         toolbar_layout.title = movie.originalTitle
-        Picasso.with(this)
-                .load(Constants.POSTER_BASE_URL + movie.posterPath)
-                .into(poster_container)
-        poster_container.cropToTop()
-
+        poster_container.setImageURI(Uri.parse(Constants.POSTER_BASE_URL + movie.posterPath))
+        setFocusCropRect()
         getCast(movie)
     }
 
@@ -162,13 +158,8 @@ class MovieActivity : AppCompatActivity() {
 
     fun Context.errorToast(message : Int)  { Toast.makeText(this, message, Toast.LENGTH_SHORT).show() }
 
-    fun ImageView.cropToTop() {
-        val matrix = this.matrix
-        val scaleRatioWidth = resources.displayMetrics.widthPixels / this.drawable.intrinsicWidth
-        val scaleRatioHeight = resources.displayMetrics.heightPixels / this.drawable.intrinsicHeight
-
-        val scaleFactor = if (scaleRatioWidth > scaleRatioHeight) scaleRatioWidth else scaleRatioHeight
-        matrix.postScale(scaleFactor.toFloat() * 1.1F, scaleFactor.toFloat() * 1.1F)
-        this.imageMatrix = matrix
+    fun setFocusCropRect() {
+        val point : PointF = PointF(0.5f, 0f)
+        poster_container.hierarchy.setActualImageFocusPoint(point)
     }
 }

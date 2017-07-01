@@ -6,6 +6,8 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import com.facebook.drawee.view.SimpleDraweeView
 import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.models.Cast
 import kotlinx.android.synthetic.main.actor_rv_item.view.*
@@ -34,6 +36,6 @@ class CastAdapter(val castList : List<Cast>, val context: Context) : RecyclerVie
 }
 
 class CastHolder(item:View) : RecyclerView.ViewHolder(item) {
-    var actorPhoto = item.actor_photo
-    var actorName = item.actor_name
+    var actorPhoto: SimpleDraweeView = item.actor_photo
+    var actorName: TextView = item.actor_name
 }

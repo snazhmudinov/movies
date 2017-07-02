@@ -25,6 +25,8 @@ import java.util.List;
 import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import icepick.Icepick;
+import icepick.Icicle;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -49,10 +51,13 @@ public class  MovieListActivity extends AppCompatActivity {
     private List<Movie> mFetchedMovies = new ArrayList<>();
     private SparseArray<String> mMap = new SparseArray<>();
 
+    @Icicle String mCurrentSelection = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_list);
+        Icepick.restoreInstanceState(this, savedInstanceState);
 
         ((MovieApplication)getApplication()).getNetworkComponents().inject(this);
         ButterKnife.bind(this);
@@ -60,12 +65,23 @@ public class  MovieListActivity extends AppCompatActivity {
         initLayoutManager();
         setupDrawerContent();
 
-        mMap.append(R.id.action_popular, "popular");
-        mMap.append(R.id.action_now_playing, "now_playing");
-        mMap.append(R.id.action_top_rated, "top_rated");
-        mMap.append(R.id.action_upcoming, "upcoming");
+        //Setup categories and corresponding IDs
+        initMap();
 
-        fetchMovies(Constants.CATEGORY_POPULAR);
+        //if nothing to restore, default the selection
+        if (mCurrentSelection == null) {
+            mCurrentSelection = mMap.get(R.id.action_popular);
+            mNavView.setCheckedItem(R.id.action_popular);
+        }
+
+        //Fetching the movies of given category
+        fetchMovies(mCurrentSelection);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Icepick.saveInstanceState(this, outState);
     }
 
     private void setupDrawerContent() {
@@ -84,10 +100,12 @@ public class  MovieListActivity extends AppCompatActivity {
         mNavView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                item.setCheckable(true);
                 item.setChecked(true);
+                final String category = mMap.get(item.getItemId());
 
-                fetchMovies(mMap.get(item.getItemId()));
+                mCurrentSelection = category;
+                fetchMovies(category);
+
                 mParentView.closeDrawers();
                 return true;
             }
@@ -106,6 +124,14 @@ public class  MovieListActivity extends AppCompatActivity {
         //Populate & set adapter
         MoviesAdapter adapter = new MoviesAdapter(mFetchedMovies, this);
         mMoviesRecyclerView.setAdapter(adapter);
+    }
+
+    private void initMap() {
+        //menu item id -> string category
+        mMap.append(R.id.action_popular, "popular");
+        mMap.append(R.id.action_now_playing, "now_playing");
+        mMap.append(R.id.action_top_rated, "top_rated");
+        mMap.append(R.id.action_upcoming, "upcoming");
     }
 
     private List<Movie> fetchMovies(String category) {

@@ -2,16 +2,16 @@ package com.snazhmudinov.movies.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.snazhmudinov.movies.R;
 import com.snazhmudinov.movies.activities.MovieActivity;
 import com.snazhmudinov.movies.constans.Constants;
 import com.snazhmudinov.movies.models.Movie;
-import com.squareup.picasso.Picasso;
 import org.parceler.Parcels;
 import java.util.List;
 import butterknife.BindView;
@@ -43,10 +43,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolde
     @Override
     public void onBindViewHolder(MovieHolder holder, int position) {
         Movie currentMovie = moviesList.get(position);
-
-        Picasso.with(mContext)
-                .load(Constants.POSTER_BASE_URL + currentMovie.getPosterPath())
-                .into(holder.mPosterView);
+        holder.mPosterView.setImageURI(Uri.parse(Constants.POSTER_BASE_URL + currentMovie.getPosterPath()));
     }
 
     @Override
@@ -58,7 +55,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolde
         private Context context;
 
         @BindView(R.id.poster)
-        ImageView mPosterView;
+        SimpleDraweeView mPosterView;
 
         MovieHolder(View itemView, Context context) {
             super(itemView);

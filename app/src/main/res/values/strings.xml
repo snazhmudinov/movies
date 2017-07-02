@@ -12,4 +12,10 @@
     <string name="added_to_favorites">Added to favorites</string>
     <string name="undo">Undo</string>
     <string name="actors_title">Actors</string>
+
+    <!-- Categories -->
+    <string name="popular">Popular</string>
+    <string name="now_playing">Now playing</string>
+    <string name="top_rated">Top rated</string>
+    <string name="upcoming">Upcoming</string>
 </resources>

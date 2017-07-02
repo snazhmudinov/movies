@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:title="Item 1" />
-    <item android:title="Item 2" />
-    <item android:title="Item 3" />
-    <item android:title="Item 4" />
-    <item android:title="Item 5" />
+    <item android:id="@+id/action_popular" android:title="@string/popular" />
+    <item android:id="@+id/action_now_playing" android:title="@string/now_playing" />
+    <item android:id="@+id/action_top_rated" android:title="@string/top_rated" />
+    <item android:id="@+id/action_upcoming" android:title="@string/upcoming" />
 
 </menu>

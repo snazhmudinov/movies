@@ -8,11 +8,11 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
-
 import com.snazhmudinov.movies.R;
 import com.snazhmudinov.movies.adapters.MoviesAdapter;
 import com.snazhmudinov.movies.application.MovieApplication;
@@ -20,12 +20,9 @@ import com.snazhmudinov.movies.constans.Constants;
 import com.snazhmudinov.movies.endpoints.MoviesEndPointsInterface;
 import com.snazhmudinov.movies.models.Movie;
 import com.snazhmudinov.movies.models.MovieResponse;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Call;
@@ -50,6 +47,7 @@ public class  MovieListActivity extends AppCompatActivity {
     NavigationView mNavView;
 
     private List<Movie> mFetchedMovies = new ArrayList<>();
+    private SparseArray<String> mMap = new SparseArray<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +59,11 @@ public class  MovieListActivity extends AppCompatActivity {
 
         initLayoutManager();
         setupDrawerContent();
+
+        mMap.append(R.id.action_popular, "popular");
+        mMap.append(R.id.action_now_playing, "now_playing");
+        mMap.append(R.id.action_top_rated, "top_rated");
+        mMap.append(R.id.action_upcoming, "upcoming");
 
         fetchMovies(Constants.CATEGORY_POPULAR);
     }
@@ -81,7 +84,10 @@ public class  MovieListActivity extends AppCompatActivity {
         mNavView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                Toast.makeText(MovieListActivity.this, item.getTitle(), Toast.LENGTH_SHORT).show();
+                item.setCheckable(true);
+                item.setChecked(true);
+
+                fetchMovies(mMap.get(item.getItemId()));
                 mParentView.closeDrawers();
                 return true;
             }

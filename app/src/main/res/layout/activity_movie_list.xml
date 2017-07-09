@@ -19,8 +19,9 @@
             app:titleTextColor="@android:color/white"
             app:navigationIcon="@drawable/icon_menu"/>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/movies_recycler_view"
+        <fragment
+            android:id="@+id/movies_list_fragment"
+            android:name="com.snazhmudinov.movies.fragments.MoviesListFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/toolbar"/>

@@ -38,7 +38,7 @@ class MoviesListFragment: BaseMovieFragment() {
 
         //if nothing to restore, default the selection
         if (currentSelection.isEmpty()) {
-            currentSelection = mMap.get(R.id.action_popular)!!
+            currentSelection = mMap[R.id.action_popular].toString()
         }
 
         fetchMovies(currentSelection)
@@ -64,7 +64,7 @@ class MoviesListFragment: BaseMovieFragment() {
         mMap.put(R.id.action_upcoming, "upcoming")
     }
 
-    fun getValueFor(key: Int) = mMap.get(key)
+    fun getValueFor(key: Int) = mMap[key]
 
     fun getKeyForValue(value: String): Int {
        return mMap.filterValues { it == value }
@@ -85,7 +85,7 @@ class MoviesListFragment: BaseMovieFragment() {
                     mFetchedMovies.clear()
 
                     //Get response -> List of movies
-                    mFetchedMovies = response.body()!!.results
+                    response.body()?.let { mFetchedMovies = it.results }
 
                     //Initialize adapter
                     initAdapter()

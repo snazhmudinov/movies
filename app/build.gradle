@@ -62,6 +62,7 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {
         transitive = true;
     }
+    compile 'org.jetbrains.anko:anko-sqlite:0.10.0'
 }
 repositories {
     mavenCentral()

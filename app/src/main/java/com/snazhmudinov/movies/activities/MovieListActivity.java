@@ -36,7 +36,7 @@ public class  MovieListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_list);
-        ((MovieApplication)getApplication()).getNetworkComponents().inject(this);
+        ((MovieApplication)getApplication()).getAppComponents().inject(this);
         ButterKnife.bind(this);
 
         mMoviesListFragment = (MoviesListFragment) getSupportFragmentManager()

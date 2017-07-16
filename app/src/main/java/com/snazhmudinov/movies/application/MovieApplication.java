@@ -4,8 +4,9 @@ import android.app.Application;
 
 import com.crashlytics.android.Crashlytics;
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.snazhmudinov.movies.components.DaggerNetworkComponents;
-import com.snazhmudinov.movies.components.NetworkComponents;
+import com.snazhmudinov.movies.components.AppComponents;
+import com.snazhmudinov.movies.components.DaggerAppComponents;
+import com.snazhmudinov.movies.modules.DatabaseModule;
 import com.snazhmudinov.movies.modules.NetworkModule;
 import io.fabric.sdk.android.Fabric;
 
@@ -15,7 +16,7 @@ import io.fabric.sdk.android.Fabric;
 
 public class MovieApplication extends Application {
 
-    private NetworkComponents networkComponents;
+    private AppComponents appComponents;
 
     @Override
     public void onCreate() {
@@ -23,12 +24,13 @@ public class MovieApplication extends Application {
         Fabric.with(this, new Crashlytics());
 
         Fresco.initialize(this);
-        networkComponents = DaggerNetworkComponents.builder()
+        appComponents = DaggerAppComponents.builder()
                                 .networkModule(new NetworkModule())
+                                .databaseModule(new DatabaseModule(getApplicationContext()))
                                 .build();
     }
 
-    public NetworkComponents getNetworkComponents() {
-        return networkComponents;
+    public AppComponents getAppComponents() {
+        return appComponents;
     }
 }

@@ -2,7 +2,9 @@ package com.snazhmudinov.movies.database
 
 import android.content.Context
 import android.widget.Toast
+import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.models.Movie
+import org.jetbrains.anko.db.delete
 import org.jetbrains.anko.db.insert
 import org.jetbrains.anko.db.select
 
@@ -12,14 +14,10 @@ import org.jetbrains.anko.db.select
 class DatabaseManager(val context: Context) {
 
     fun insertMovieIntoDB(movie: Movie) {
-        if (isMovieInDatabase(movie)) {
-            Toast.makeText(context, "Movie's been already saved", Toast.LENGTH_SHORT).show()
-        } else {
-            context.database.use {
-                insert(MoviesDatabaseHelper.TABLE_NAME,
-                        MoviesDatabaseHelper.COLUMN_MOVIE_ID to movie.id,
-                        MoviesDatabaseHelper.COLUMN_MOVIE_NAME to movie.originalTitle)
-            }
+        context.database.use {
+            insert(MoviesDatabaseHelper.TABLE_NAME,
+                    MoviesDatabaseHelper.COLUMN_MOVIE_ID to movie.id,
+                    MoviesDatabaseHelper.COLUMN_MOVIE_NAME to movie.originalTitle)
         }
     }
 
@@ -39,6 +37,10 @@ class DatabaseManager(val context: Context) {
     }
 
     fun deleteMovieFromDb(movie: Movie) {
-
+        context.database.use {
+            val count = delete(MoviesDatabaseHelper.TABLE_NAME, "(${MoviesDatabaseHelper.COLUMN_MOVIE_ID} = ${movie.id})")
+            val stringRes = if (count > 0) R.string.success_deleting_movie else R.string.failure_deleting_movie
+            Toast.makeText(context, stringRes, Toast.LENGTH_SHORT).show()
+        }
     }
 }

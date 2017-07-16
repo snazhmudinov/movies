@@ -18,4 +18,7 @@
     <string name="now_playing">Now playing</string>
     <string name="top_rated">Top rated</string>
     <string name="upcoming">Upcoming</string>
+
+    <string name="success_deleting_movie">Deleted the movie from database</string>
+    <string name="failure_deleting_movie">Failed to delete the movie from database</string>
 </resources>

@@ -12,6 +12,7 @@ apply plugin: 'io.fabric'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.jakewharton.butterknife'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: "io.mironov.smuggler"
 
 android {
     compileSdkVersion 25

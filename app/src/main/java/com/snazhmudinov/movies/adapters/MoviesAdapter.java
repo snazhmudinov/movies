@@ -12,7 +12,6 @@ import com.snazhmudinov.movies.R;
 import com.snazhmudinov.movies.activities.MovieActivity;
 import com.snazhmudinov.movies.constans.Constants;
 import com.snazhmudinov.movies.models.Movie;
-import org.parceler.Parcels;
 import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -69,7 +68,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolde
             Movie movie = moviesList.get(getAdapterPosition());
 
             Intent intent = new Intent(context, MovieActivity.class);
-            intent.putExtra(Constants.MOVIE_KEY, Parcels.wrap(movie));
+            intent.putExtra(Constants.MOVIE_KEY, movie);
             context.startActivity(intent);
         }
     }

@@ -15,6 +15,7 @@ class MoviesDatabaseHelper(context: Context): ManagedSQLiteOpenHelper(context, "
 
         val COLUMN_MOVIE_ID = "movie_id"
         val COLUMN_MOVIE_NAME = "name"
+        val COLUMN_TRAILER_LINK = "trailer_link"
 
         private var instance: MoviesDatabaseHelper? = null
 
@@ -33,7 +34,8 @@ class MoviesDatabaseHelper(context: Context): ManagedSQLiteOpenHelper(context, "
                 TABLE_NAME, true,
                 "id" to INTEGER + PRIMARY_KEY + AUTOINCREMENT,
                 COLUMN_MOVIE_ID to INTEGER,
-                COLUMN_MOVIE_NAME to TEXT
+                COLUMN_MOVIE_NAME to TEXT,
+                COLUMN_TRAILER_LINK to TEXT
         )
     }
 

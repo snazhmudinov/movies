@@ -17,7 +17,8 @@ class DatabaseManager(val context: Context) {
         context.database.use {
             insert(MoviesDatabaseHelper.TABLE_NAME,
                     MoviesDatabaseHelper.COLUMN_MOVIE_ID to movie.id,
-                    MoviesDatabaseHelper.COLUMN_MOVIE_NAME to movie.originalTitle)
+                    MoviesDatabaseHelper.COLUMN_MOVIE_NAME to movie.originalTitle,
+                    MoviesDatabaseHelper.COLUMN_TRAILER_LINK to movie.trailer)
         }
     }
 
@@ -25,10 +26,7 @@ class DatabaseManager(val context: Context) {
         var isInDb: Boolean = false
         context.database.use {
             select(MoviesDatabaseHelper.TABLE_NAME)
-                    .whereArgs("(${MoviesDatabaseHelper.COLUMN_MOVIE_ID} = {movieId}) and " +
-                            "(${MoviesDatabaseHelper.COLUMN_MOVIE_NAME} = {movieName})",
-                            "movieId" to movie.id,
-                            "movieName" to movie.originalTitle)
+                    .whereArgs("(${MoviesDatabaseHelper.COLUMN_MOVIE_ID} = ${movie.id})")
                     .exec {
                         isInDb =  count > 0
                     }

@@ -3,12 +3,9 @@ package com.snazhmudinov.movies.models
 import com.google.gson.annotations.SerializedName
 import com.snazhmudinov.movies.constans.Constants
 
-import org.parceler.Parcel
-
 /**
  * Created by snazhmudinov on 6/10/17.
  */
-@Parcel
 class Result {
     @SerializedName("id")
     var id: String? = null

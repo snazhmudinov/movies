@@ -9,6 +9,7 @@ import android.widget.Toast
 import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.adapters.MoviesAdapter
 import com.snazhmudinov.movies.constans.Constants
+import com.snazhmudinov.movies.database.DatabaseManager
 import com.snazhmudinov.movies.endpoints.MoviesEndPointsInterface
 import com.snazhmudinov.movies.models.Movie
 import com.snazhmudinov.movies.models.MovieResponse
@@ -62,6 +63,7 @@ class MoviesListFragment: BaseMovieFragment() {
         mMap.put(R.id.action_now_playing, "now_playing")
         mMap.put(R.id.action_top_rated, "top_rated")
         mMap.put(R.id.action_upcoming, "upcoming")
+        mMap.put(R.id.action_favorite, "favorite")
     }
 
     fun getValueFor(key: Int) = mMap[key]
@@ -69,6 +71,12 @@ class MoviesListFragment: BaseMovieFragment() {
     fun getKeyForValue(value: String): Int {
        return mMap.filterValues { it == value }
                .keys.first()
+    }
+
+    fun fetchLocallyStoredMovies() {
+        if (!mDatabaseManager.tableHasRecords()) {
+            Toast.makeText(context, "Empty table", Toast.LENGTH_SHORT).show()
+        }
     }
 
     fun fetchMovies(category: String): List<Movie> {

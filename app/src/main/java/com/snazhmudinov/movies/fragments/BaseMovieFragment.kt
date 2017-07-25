@@ -3,6 +3,7 @@ package com.snazhmudinov.movies.fragments
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import com.snazhmudinov.movies.application.MovieApplication
+import com.snazhmudinov.movies.database.DatabaseManager
 import retrofit2.Retrofit
 import javax.inject.Inject
 
@@ -12,6 +13,7 @@ import javax.inject.Inject
 open class BaseMovieFragment: Fragment() {
 
     @Inject protected lateinit var mRetrofit: Retrofit
+    @Inject protected lateinit var mDatabaseManager: DatabaseManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

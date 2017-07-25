@@ -9,6 +9,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
+
 import com.snazhmudinov.movies.R;
 import com.snazhmudinov.movies.application.MovieApplication;
 import com.snazhmudinov.movies.fragments.MoviesListFragment;
@@ -63,7 +65,13 @@ public class  MovieListActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 final String category = mMoviesListFragment.getValueFor(item.getItemId());
-                mMoviesListFragment.fetchMovies(category);
+
+                if (category.equalsIgnoreCase(getString(R.string.favorite))) {
+                    mMoviesListFragment.fetchLocallyStoredMovies();
+                } else {
+                    mMoviesListFragment.fetchMovies(category);
+                }
+
                 item.setChecked(true);
                 mParentView.closeDrawers();
                 return true;

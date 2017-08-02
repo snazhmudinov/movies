@@ -54,7 +54,7 @@ class DatabaseManager(val context: Context) {
         }
     }
 
-    fun getAllRecords(): List<Movie>? {
+    fun getAllRecords(): MutableList<Movie> {
         val movies: MutableList<Movie> = ArrayList()
 
         context.database.use {

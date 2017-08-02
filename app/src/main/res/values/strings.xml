@@ -22,4 +22,6 @@
 
     <string name="success_deleting_movie">Deleted the movie from database</string>
     <string name="failure_deleting_movie">Failed to delete the movie from database</string>
+
+    <string name="empty_table_error">You didn\'t store any movie</string>
 </resources>

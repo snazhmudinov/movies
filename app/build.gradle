@@ -1,4 +1,14 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.jakewharton.butterknife'
 apply plugin: 'kotlin-android-extensions'
@@ -49,7 +59,11 @@ dependencies {
     compile files('libs/YouTubeAndroidPlayerApi.jar')
     compile 'com.github.frankiesardo:icepick:2.3.6'
     provided 'com.github.frankiesardo:icepick-processor:2.3.6'
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {
+        transitive = true;
+    }
 }
 repositories {
     mavenCentral()
+    maven { url 'https://maven.fabric.io/public' }
 }

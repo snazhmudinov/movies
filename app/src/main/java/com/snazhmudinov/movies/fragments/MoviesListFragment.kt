@@ -51,9 +51,9 @@ class MoviesListFragment: BaseMovieFragment() {
         moviesRecyclerView.layoutManager = mLayoutManager
     }
 
-    fun initAdapter() {
+    fun populateAdapter(movies: MutableList<Movie>) {
         //Populate & set adapter
-        val adapter = MoviesAdapter(mFetchedMovies, context)
+        val adapter = MoviesAdapter(movies, context)
         moviesRecyclerView.adapter = adapter
     }
 
@@ -74,12 +74,12 @@ class MoviesListFragment: BaseMovieFragment() {
     }
 
     fun fetchLocallyStoredMovies() {
-        if (!mDatabaseManager.tableHasRecords()) {
-            Toast.makeText(context, "Empty table", Toast.LENGTH_SHORT).show()
+        if (mDatabaseManager.tableHasRecords()) {
+            populateAdapter(mDatabaseManager.getAllRecords())
         }
     }
 
-    fun fetchMovies(category: String): List<Movie> {
+    fun fetchMovies(category: String) {
 
         val service = mRetrofit.create(MoviesEndPointsInterface::class.java)
         val call = service?.getMovies(category, Constants.API_KEY)
@@ -89,14 +89,8 @@ class MoviesListFragment: BaseMovieFragment() {
         call?.enqueue(object : Callback<MovieResponse> {
             override fun onResponse(call: Call<MovieResponse>, response: Response<MovieResponse>) {
                 if (response.isSuccessful) {
-                    //First clear the previous entries
-                    mFetchedMovies.clear()
-
                     //Get response -> List of movies
-                    response.body()?.let { mFetchedMovies = it.results }
-
-                    //Initialize adapter
-                    initAdapter()
+                    response.body()?.let { populateAdapter(it.results) }
 
                 } else {
                     Toast.makeText(activity, R.string.unsuccessful_response, Toast.LENGTH_SHORT).show()
@@ -107,7 +101,5 @@ class MoviesListFragment: BaseMovieFragment() {
                 Toast.makeText(activity, R.string.error_call, Toast.LENGTH_SHORT).show()
             }
         })
-
-        return mFetchedMovies
     }
 }

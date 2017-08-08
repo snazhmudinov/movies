@@ -58,6 +58,7 @@ class MoviesListFragment: BaseMovieFragment() {
     fun getIdOfCategory(category: String) = Category.valueOf(category).id
 
     fun fetchMovies(category: String) {
+        currentSelection = category
 
         when(category) {
             Category.favorite.name -> {
@@ -69,8 +70,6 @@ class MoviesListFragment: BaseMovieFragment() {
             else -> {
                 val service = mRetrofit.create(MoviesEndPointsInterface::class.java)
                 val call = service?.getMovies(category, Constants.API_KEY)
-
-                currentSelection = category
 
                 call?.enqueue(object : Callback<MovieResponse> {
                     override fun onResponse(call: Call<MovieResponse>, response: Response<MovieResponse>) {

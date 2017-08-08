@@ -59,24 +59,22 @@ class DatabaseManager(val context: Context) {
 
         context.database.use {
             select(MoviesDatabaseHelper.TABLE_NAME, "*").exec {
-                if (moveToFirst()) {
 
-                    while (moveToNext()) {
-                        val movieId = getInt(getColumnIndex(MoviesDatabaseHelper.COLUMN_MOVIE_ID))
-                        val movieName = getString(getColumnIndex(MoviesDatabaseHelper.COLUMN_MOVIE_NAME))
-                        val trailerLink = getString(getColumnIndex(MoviesDatabaseHelper.COLUMN_TRAILER_LINK))
-                        val posterPath = getString(getColumnIndex(MoviesDatabaseHelper.COLUMN_POSTER_LINK))
-                        val overview = getString(getColumnIndex(MoviesDatabaseHelper.COLUMN_OVERVIEW))
-                        val releaseDate = getString(getColumnIndex(MoviesDatabaseHelper.COLUMN_RELEASE_DATE))
-                        val popularity = getDouble(getColumnIndex(MoviesDatabaseHelper.COLUMN_POPULARITY))
-                        val voteCount = getInt(getColumnIndex(MoviesDatabaseHelper.COLUMN_VOTE_COUNT))
+                while (moveToNext()) {
+                    val movieId = getInt(getColumnIndex(MoviesDatabaseHelper.COLUMN_MOVIE_ID))
+                    val movieName = getString(getColumnIndex(MoviesDatabaseHelper.COLUMN_MOVIE_NAME))
+                    val trailerLink = getString(getColumnIndex(MoviesDatabaseHelper.COLUMN_TRAILER_LINK))
+                    val posterPath = getString(getColumnIndex(MoviesDatabaseHelper.COLUMN_POSTER_LINK))
+                    val overview = getString(getColumnIndex(MoviesDatabaseHelper.COLUMN_OVERVIEW))
+                    val releaseDate = getString(getColumnIndex(MoviesDatabaseHelper.COLUMN_RELEASE_DATE))
+                    val popularity = getDouble(getColumnIndex(MoviesDatabaseHelper.COLUMN_POPULARITY))
+                    val voteCount = getInt(getColumnIndex(MoviesDatabaseHelper.COLUMN_VOTE_COUNT))
 
-                        val movie = Movie(posterPath, overview, releaseDate, movieId, movieName,
-                                movieName, popularity, voteCount)
-                        movie.trailer = trailerLink
+                    val movie = Movie(posterPath, overview, releaseDate, movieId, movieName,
+                            movieName, popularity, voteCount)
+                    movie.trailer = trailerLink
 
-                        movies.add(movie)
-                    }
+                    movies.add(movie)
                 }
             }
         }

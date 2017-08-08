@@ -52,13 +52,8 @@ class MoviesListFragment: BaseMovieFragment() {
         val adapter = MoviesAdapter(movies, context)
         moviesRecyclerView.adapter = adapter
     }
-
-    fun getCategoryForId(key: Int): String {
-        return Category.values().filter {
-            it.id == key
-        }.first().name
-
-    }
+    
+    fun getCategoryForId(key: Int) = Category.values().filter { it.id == key }.first().name
 
     fun getIdOfCategory(category: String) = Category.valueOf(category).id
 
@@ -80,7 +75,7 @@ class MoviesListFragment: BaseMovieFragment() {
                 call?.enqueue(object : Callback<MovieResponse> {
                     override fun onResponse(call: Call<MovieResponse>, response: Response<MovieResponse>) {
                         if (response.isSuccessful) {
-                            //Get response -> List of movies
+                            //Get response -> Populate the adapter
                             response.body()?.let { populateAdapter(it.results) }
 
                         } else {

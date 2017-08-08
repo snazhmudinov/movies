@@ -9,8 +9,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
-
 import com.snazhmudinov.movies.R;
 import com.snazhmudinov.movies.application.MovieApplication;
 import com.snazhmudinov.movies.fragments.MoviesListFragment;
@@ -60,18 +58,14 @@ public class  MovieListActivity extends AppCompatActivity {
         });
 
         //Set click listeners to nav items
-        mNavView.setCheckedItem(mMoviesListFragment.getKeyForValue(mMoviesListFragment.getCurrentSelection()));
+        final int currentId = mMoviesListFragment.getIdOfCategory(mMoviesListFragment.getCurrentSelection());
+        mNavView.setCheckedItem(currentId);
         mNavView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                final String category = mMoviesListFragment.getValueFor(item.getItemId());
+                final String category = mMoviesListFragment.getCategoryForId(item.getItemId());
 
-                if (category.equalsIgnoreCase(getString(R.string.favorite))) {
-                    mMoviesListFragment.fetchLocallyStoredMovies();
-                } else {
-                    mMoviesListFragment.fetchMovies(category);
-                }
-
+                mMoviesListFragment.fetchMovies(category);
                 item.setChecked(true);
                 mParentView.closeDrawers();
                 return true;

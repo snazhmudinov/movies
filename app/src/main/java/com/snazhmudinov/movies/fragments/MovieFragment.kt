@@ -15,10 +15,11 @@ import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.adapters.CastAdapter
 import com.snazhmudinov.movies.constans.Constants
 import com.snazhmudinov.movies.endpoints.MoviesEndPointsInterface
+import com.snazhmudinov.movies.manager.DownloadInterface
+import com.snazhmudinov.movies.manager.downloadImageAndGetPath
 import com.snazhmudinov.movies.models.Cast
 import com.snazhmudinov.movies.models.CastList
 import com.snazhmudinov.movies.models.Movie
-import com.snazhmudinov.movies.models.Trailer
 import kotlinx.android.synthetic.main.movie_content.*
 import kotlinx.android.synthetic.main.movie_fragment.*
 import retrofit2.Call
@@ -27,9 +28,9 @@ import retrofit2.Response
 /**
  * Created by snazhmudinov on 7/23/17.
  */
-class MovieFragment: BaseMovieFragment() {
+class MovieFragment: BaseMovieFragment(), View.OnClickListener, DownloadInterface {
 
-    private var mIsAdded = false
+    var movie: Movie? = null
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?) =
             inflater?.inflate(R.layout.movie_fragment, container, false)
@@ -37,34 +38,21 @@ class MovieFragment: BaseMovieFragment() {
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val movie : Movie = activity.intent.getParcelableExtra(Constants.MOVIE_KEY)
+        movie = activity.intent.getParcelableExtra(Constants.MOVIE_KEY)
 
-        configureToolbar()
-        configureFab()
-
-        fab.setOnClickListener {
-            displaySnackbar()
-            mIsAdded = !mIsAdded
-            configureFab()
+        movie?.let {
+            toolbar_layout.title = it.originalTitle
+            poster_container.setImageURI(Uri.parse(Constants.POSTER_BASE_URL + it.posterPath))
+            setFocusCropRect()
+            getCast(it)
+            configureToolbar()
+            configureFab(mDatabaseManager.isMovieInDatabase(it))
         }
 
-        trailer_icon.setOnClickListener {
-            playTrailer(movie)
-        }
+        fab?.setOnClickListener(this)
+        trailer_icon?.setOnClickListener(this)
+        actors_drop_down?.setOnClickListener(this)
 
-        actors_drop_down.setOnClickListener {
-            val visibility = cast_recycler_view.visibility
-            cast_recycler_view.visibility = if (visibility == View.VISIBLE) View.GONE else View.VISIBLE
-
-            val drawable = if (cast_recycler_view.visibility == View.VISIBLE) R.drawable.ic_arrow_drop_up
-            else R.drawable.ic_arrow_drop_down
-            actors_drop_down.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawable, 0)
-        }
-
-        toolbar_layout.title = movie.originalTitle
-        poster_container.setImageURI(Uri.parse(Constants.POSTER_BASE_URL + movie.posterPath))
-        setFocusCropRect()
-        getCast(movie)
     }
 
     fun setupMovieCast(castList : List<Cast>) {
@@ -74,13 +62,14 @@ class MovieFragment: BaseMovieFragment() {
     }
 
     private fun displaySnackbar() {
-        val mSnackbar = if (!mIsAdded)
-            Snackbar.make(this.view!!, R.string.added_to_favorites, Snackbar.LENGTH_LONG) else null
-        mSnackbar?.setAction(R.string.undo, {
-            mIsAdded = false
-            configureFab()
-        })
-        mSnackbar?.show()
+        movie?.let { movie ->
+            val snackbar = Snackbar.make(view!!, R.string.added_to_favorites, Snackbar.LENGTH_LONG)
+            snackbar.setAction(R.string.undo) {
+                mDatabaseManager.deleteMovieFromDb(movie)
+                configureFab(mDatabaseManager.isMovieInDatabase(movie))
+            }
+            snackbar.show()
+        }
     }
 
     private fun configureToolbar() {
@@ -90,38 +79,9 @@ class MovieFragment: BaseMovieFragment() {
         }
     }
 
-    private fun configureFab() {
-        val resId =  if(mIsAdded) R.drawable.ic_clear else R.drawable.ic_add
+    private fun configureFab(isAdded: Boolean) {
+        val resId =  if(isAdded) R.drawable.ic_clear else R.drawable.ic_add
         fab.setImageResource(resId)
-    }
-
-    private fun playTrailer(movie : Movie) {
-        val service = mRetrofit.create(MoviesEndPointsInterface::class.java)
-        val call = service.getYouTubeTrailer(movie.id.toString(), Constants.API_KEY)
-
-        call.enqueue(object : retrofit2.Callback<Trailer> {
-            override fun onResponse(call: Call<Trailer>, response: Response<Trailer>) {
-                if (response.isSuccessful) {
-                    val responseResults = response.body()?.results
-
-                    if (responseResults?.isNotEmpty() as Boolean) {
-                        responseResults.let {
-                            val url = it[0]?.trailerURL
-                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                        }
-                    } else {
-                        errorToast(R.string.no_trailer_error)
-                    }
-
-                } else {
-                    errorToast(R.string.unsuccessful_response)
-                }
-            }
-
-            override fun onFailure(call: Call<Trailer>, t: Throwable) {
-                errorToast(R.string.error_call)
-            }
-        })
     }
 
     private fun getCast(movie : Movie) {
@@ -145,6 +105,44 @@ class MovieFragment: BaseMovieFragment() {
                 errorToast(R.string.error_call)
             }
         })
+    }
+
+    override fun onClick(v: View?) {
+        when(v?.id) {
+            R.id.fab -> {
+                movie?.let {
+                    if (mDatabaseManager.isMovieInDatabase(it)) {
+                        mDatabaseManager.deleteMovieFromDb(it)
+                        configureFab(mDatabaseManager.isMovieInDatabase(it))
+                    } else {
+                        downloadImageAndGetPath(context, it, this)
+                    }
+                }
+            }
+
+            R.id.trailer_icon -> {
+                movie?.let {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it.trailer)))
+                }
+            }
+
+            R.id.actors_drop_down -> {
+                val visibility = cast_recycler_view.visibility
+                cast_recycler_view.visibility = if (visibility == View.VISIBLE) View.GONE else View.VISIBLE
+
+                val drawable = if (cast_recycler_view.visibility == View.VISIBLE) R.drawable.ic_arrow_drop_up
+                else R.drawable.ic_arrow_drop_down
+                actors_drop_down.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawable, 0)
+            }
+        }
+    }
+
+    override fun downloadFinished() {
+        movie?.let {
+            mDatabaseManager.insertMovieIntoDB(it)
+            configureFab(mDatabaseManager.isMovieInDatabase(it))
+            displaySnackbar()
+        }
     }
 
     fun errorToast(message : Int)  { Toast.makeText(context, message, Toast.LENGTH_SHORT).show() }

@@ -60,6 +60,7 @@ dependencies {
         transitive = true;
     }
     compile 'org.jetbrains.anko:anko-sqlite:0.10.0'
+    compile 'com.squareup.picasso:picasso:2.5.2'
 }
 repositories {
     mavenCentral()

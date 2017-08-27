@@ -9,7 +9,7 @@ import com.snazhmudinov.movies.constans.Constants
 /**
  * Created by snazhmudinov on 7/23/17.
  */
-data class Movie(@SerializedName("poster_path") val posterPath: String,
+data class Movie(@SerializedName("poster_path") var posterPath: String,
                  @SerializedName("overview") val overview: String,
                  @SerializedName("release_date") val releaseDate: String,
                  @SerializedName("id") val id: Int,

@@ -29,7 +29,7 @@ class DatabaseManager(val context: Context) {
     }
 
     fun isMovieInDatabase(movie: Movie): Boolean {
-        var isInDb: Boolean = false
+        var isInDb = false
         context.database.use {
             select(MoviesDatabaseHelper.TABLE_NAME)
                     .whereArgs("(${MoviesDatabaseHelper.COLUMN_MOVIE_ID} = ${movie.id})")

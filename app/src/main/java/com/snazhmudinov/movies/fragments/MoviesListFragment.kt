@@ -1,7 +1,6 @@
 package com.snazhmudinov.movies.fragments
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.adapters.MoviesAdapter
-import com.snazhmudinov.movies.application.MovieApplication
 import com.snazhmudinov.movies.constans.Constants
 import com.snazhmudinov.movies.endpoints.MoviesEndPointsInterface
 import com.snazhmudinov.movies.models.Movie
@@ -18,28 +16,19 @@ import kotlinx.android.synthetic.main.fragment_movies_list.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
 import java.util.ArrayList
-import javax.inject.Inject
 
 /**
  * Created by snazhmudinov on 7/9/17.
  */
-class MoviesListFragment: Fragment() {
-
-    @Inject lateinit var mRetrofit: Retrofit
+class MoviesListFragment: BaseMovieFragment() {
 
     var currentSelection: String = ""
     var mFetchedMovies: MutableList<Movie> = ArrayList()
-    val mMap = HashMap<Int, String>()
+    private val mMap = HashMap<Int, String>()
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater?.inflate(R.layout.fragment_movies_list, container, false)
-
-        (activity.application as MovieApplication).networkComponents.inject(this)
-
-        return rootView
-    }
+    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?) =
+            inflater?.inflate(R.layout.fragment_movies_list, container, false)
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         initLayoutManager()
@@ -58,16 +47,16 @@ class MoviesListFragment: Fragment() {
     fun initLayoutManager() {
         //Layout manager region
         val mLayoutManager = GridLayoutManager(context, 2)
-        moviesRecyclerView.setLayoutManager(mLayoutManager)
+        moviesRecyclerView.layoutManager = mLayoutManager
     }
 
     fun initAdapter() {
         //Populate & set adapter
         val adapter = MoviesAdapter(mFetchedMovies, context)
-        moviesRecyclerView.setAdapter(adapter)
+        moviesRecyclerView.adapter = adapter
     }
 
-    fun initMap() {
+    private fun initMap() {
         //menu item id -> string category
         mMap.put(R.id.action_popular, "popular")
         mMap.put(R.id.action_now_playing, "now_playing")

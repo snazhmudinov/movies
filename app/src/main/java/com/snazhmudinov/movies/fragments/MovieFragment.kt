@@ -21,7 +21,6 @@ import com.snazhmudinov.movies.models.Movie
 import com.snazhmudinov.movies.models.Trailer
 import kotlinx.android.synthetic.main.movie_content.*
 import kotlinx.android.synthetic.main.movie_fragment.*
-import org.parceler.Parcels
 import retrofit2.Call
 import retrofit2.Response
 
@@ -38,7 +37,7 @@ class MovieFragment: BaseMovieFragment() {
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val movie : Movie = Parcels.unwrap(activity.intent.getParcelableExtra(Constants.MOVIE_KEY))
+        val movie : Movie = activity.intent.getParcelableExtra(Constants.MOVIE_KEY)
 
         configureToolbar()
         configureFab()

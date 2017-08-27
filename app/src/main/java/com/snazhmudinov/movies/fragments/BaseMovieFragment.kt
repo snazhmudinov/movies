@@ -17,6 +17,6 @@ open class BaseMovieFragment: Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (activity.application as MovieApplication).networkComponents.inject(this)
+        (activity.application as MovieApplication).appComponents.inject(this)
     }
 }

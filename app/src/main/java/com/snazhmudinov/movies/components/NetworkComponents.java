@@ -2,6 +2,8 @@ package com.snazhmudinov.movies.components;
 
 import com.snazhmudinov.movies.activities.MovieActivity;
 import com.snazhmudinov.movies.activities.MovieListActivity;
+import com.snazhmudinov.movies.fragments.BaseMovieFragment;
+import com.snazhmudinov.movies.fragments.MovieFragment;
 import com.snazhmudinov.movies.fragments.MoviesListFragment;
 import com.snazhmudinov.movies.modules.NetworkModule;
 
@@ -17,8 +19,7 @@ import dagger.Component;
 public interface NetworkComponents {
     //Activities
     void inject(MovieListActivity object);
-    void inject(MovieActivity object);
 
     //Fragments
-    void inject(MoviesListFragment object);
+    void inject(BaseMovieFragment object);
 }

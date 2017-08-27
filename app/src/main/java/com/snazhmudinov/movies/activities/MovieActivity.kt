@@ -1,32 +1,8 @@
 package com.snazhmudinov.movies.activities
 
-import android.content.Context
-import android.content.Intent
-import android.graphics.PointF
-import android.net.Uri
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.view.View.GONE
-import android.view.View.VISIBLE
-import android.widget.Toast
 import com.snazhmudinov.movies.R
-import com.snazhmudinov.movies.adapters.CastAdapter
-import com.snazhmudinov.movies.application.MovieApplication
-import com.snazhmudinov.movies.constans.Constants
-import com.snazhmudinov.movies.endpoints.MoviesEndPointsInterface
-import com.snazhmudinov.movies.models.Cast
-import com.snazhmudinov.movies.models.CastList
-import com.snazhmudinov.movies.models.Movie
-import com.snazhmudinov.movies.models.Trailer
-import kotlinx.android.synthetic.main.activity_movie.*
-import kotlinx.android.synthetic.main.movie_content.*
-import org.parceler.Parcels
-import retrofit2.Call
-import retrofit2.Response
-import retrofit2.Retrofit
-import javax.inject.Inject
 
 /**
  * Created by snazhmudinov on 6/10/17.
@@ -34,132 +10,8 @@ import javax.inject.Inject
 
 class MovieActivity : AppCompatActivity() {
 
-    @Inject lateinit var mRetrofit:Retrofit
-
-    var mIsAdded = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_movie)
-
-        //Dependency injection
-        val application = application as MovieApplication
-        application.networkComponents.inject(this)
-
-        val movie : Movie = Parcels.unwrap(intent.getParcelableExtra(Constants.MOVIE_KEY))
-
-        configureToolbar()
-        configureFab()
-
-        fab.setOnClickListener {
-            displaySnackbar()
-            mIsAdded = !mIsAdded
-            configureFab()
-        }
-
-        trailer_icon.setOnClickListener {
-            playTrailer(movie)
-        }
-
-        actors_drop_down.setOnClickListener {
-            val visibility = cast_recycler_view.visibility
-            cast_recycler_view.visibility = if (visibility == VISIBLE) GONE else VISIBLE
-
-            val drawable = if (cast_recycler_view.visibility == VISIBLE) R.drawable.ic_arrow_drop_up
-                                else R.drawable.ic_arrow_drop_down
-            actors_drop_down.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawable, 0)
-        }
-
-        toolbar_layout.title = movie.originalTitle
-        poster_container.setImageURI(Uri.parse(Constants.POSTER_BASE_URL + movie.posterPath))
-        setFocusCropRect()
-        getCast(movie)
-    }
-
-    fun setupMovieCast(castList : List<Cast>) {
-        cast_recycler_view.layoutManager = LinearLayoutManager(this)
-        val castAdapter = CastAdapter(castList, this)
-        cast_recycler_view.adapter = castAdapter
-    }
-
-    fun displaySnackbar() {
-        val mSnackbar = if (!mIsAdded)
-            Snackbar.make(parent_view, R.string.added_to_favorites, Snackbar.LENGTH_LONG) else null
-        mSnackbar?.setAction(R.string.undo, {
-            mIsAdded = false
-            configureFab()
-        })
-        mSnackbar?.show()
-    }
-
-    fun configureToolbar() {
-        setSupportActionBar(movie_toolbar)
-        movie_toolbar.setNavigationOnClickListener {
-            finish()
-        }
-    }
-
-    fun configureFab() {
-        val resId =  if(mIsAdded) R.drawable.ic_clear else R.drawable.ic_add
-        fab.setImageResource(resId)
-    }
-
-    fun playTrailer(movie : Movie) {
-        val service = mRetrofit.create(MoviesEndPointsInterface::class.java)
-        val call = service.getYouTubeTrailer(movie.id.toString(), Constants.API_KEY)
-
-        call.enqueue(object : retrofit2.Callback<Trailer> {
-            override fun onResponse(call: Call<Trailer>, response: Response<Trailer>) {
-                if (response.isSuccessful) {
-                    val responseResults = response.body()?.results
-
-                    if (responseResults?.isNotEmpty() as Boolean) {
-                        responseResults.let {
-                            val url = it[0]?.trailerURL
-                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                        }
-                    } else {
-                        errorToast(R.string.no_trailer_error)
-                    }
-
-                } else {
-                    errorToast(R.string.unsuccessful_response)
-                }
-            }
-
-            override fun onFailure(call: Call<Trailer>, t: Throwable) {
-                errorToast(R.string.error_call)
-            }
-        })
-    }
-
-    fun getCast(movie : Movie) {
-        val service = mRetrofit.create(MoviesEndPointsInterface::class.java)
-        val call = service.getCastList(movie.id.toString(), Constants.API_KEY)
-
-        call.enqueue(object : retrofit2.Callback<CastList> {
-            override fun onResponse(call: Call<CastList>?, response: Response<CastList>) {
-                if (response.isSuccessful) {
-                    val actors = response.body()?.castList
-                    if (actors?.isNotEmpty() as Boolean) {
-                        actors.let { setupMovieCast(it.subList(0, 5)) }
-                    }
-
-                } else {
-                    errorToast(R.string.unsuccessful_response)
-                }
-            }
-
-            override fun onFailure(call: Call<CastList>?, t: Throwable?) {
-                errorToast(R.string.error_call)
-            }
-        })
-    }
-
-    fun Context.errorToast(message : Int)  { Toast.makeText(this, message, Toast.LENGTH_SHORT).show() }
-
-    fun setFocusCropRect() {
-        val point : PointF = PointF(0.5f, 0f)
-        poster_container.hierarchy.setActualImageFocusPoint(point)
     }
 }

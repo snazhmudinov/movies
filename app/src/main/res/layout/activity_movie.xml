@@ -1,63 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:fresco="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/parent_view"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context="com.snazhmudinov.movies.activities.MovieActivity">
+    android:layout_height="match_parent">
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/app_bar"
+    <fragment
+        android:id="@+id/movie_fragment"
+        android:name="com.snazhmudinov.movies.fragments.MovieFragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fitsSystemWindows="true"
-        android:theme="@style/MoviesTheme.AppBarOverlay">
+        android:layout_height="match_parent" />
 
-        <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/toolbar_layout"
-            android:layout_width="match_parent"
-            android:layout_height="350dp"
-            android:fitsSystemWindows="true"
-            app:contentScrim="@color/colorPrimary"
-            app:expandedTitleTextAppearance="@android:color/transparent"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
-
-            <com.facebook.drawee.view.SimpleDraweeView
-                android:id="@+id/poster_container"
-                android:layout_width="match_parent"
-                android:layout_height="350dp"
-                fresco:actualImageScaleType="focusCrop"/>
-
-            <ImageView
-                android:id="@+id/trailer_icon"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                app:srcCompat="@drawable/ic_play_circle"
-                android:layout_gravity="center"/>
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/movie_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:navigationIcon="@drawable/ic_arrow_back"
-                app:layout_collapseMode="pin"
-                app:popupTheme="@style/MoviesTheme.PopupOverlay" />
-
-        </android.support.design.widget.CollapsingToolbarLayout>
-    </android.support.design.widget.AppBarLayout>
-
-    <include layout="@layout/movie_content" />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/fab_margin"
-        app:layout_anchor="@id/app_bar"
-        app:layout_anchorGravity="bottom|end" />
-
-</android.support.design.widget.CoordinatorLayout>
+</LinearLayout>

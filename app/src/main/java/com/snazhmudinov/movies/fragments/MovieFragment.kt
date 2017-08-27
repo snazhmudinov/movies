@@ -5,7 +5,6 @@ import android.graphics.PointF
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
@@ -14,7 +13,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.adapters.CastAdapter
-import com.snazhmudinov.movies.application.MovieApplication
 import com.snazhmudinov.movies.constans.Constants
 import com.snazhmudinov.movies.endpoints.MoviesEndPointsInterface
 import com.snazhmudinov.movies.models.Cast
@@ -26,25 +24,16 @@ import kotlinx.android.synthetic.main.movie_fragment.*
 import org.parceler.Parcels
 import retrofit2.Call
 import retrofit2.Response
-import retrofit2.Retrofit
-import javax.inject.Inject
 
 /**
  * Created by snazhmudinov on 7/23/17.
  */
-class MovieFragment: Fragment() {
-
-    @Inject private lateinit var mRetrofit: Retrofit
+class MovieFragment: BaseMovieFragment() {
 
     private var mIsAdded = false
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = inflater?.inflate(R.layout.movie_fragment, container, false)
-
-        (activity.application as MovieApplication).networkComponents.inject(this)
-
-        return root
-    }
+    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?) =
+            inflater?.inflate(R.layout.movie_fragment, container, false)
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -87,7 +76,7 @@ class MovieFragment: Fragment() {
 
     private fun displaySnackbar() {
         val mSnackbar = if (!mIsAdded)
-            Snackbar.make(parent_view, R.string.added_to_favorites, Snackbar.LENGTH_LONG) else null
+            Snackbar.make(this.view!!, R.string.added_to_favorites, Snackbar.LENGTH_LONG) else null
         mSnackbar?.setAction(R.string.undo, {
             mIsAdded = false
             configureFab()

@@ -20,6 +20,7 @@ import com.snazhmudinov.movies.manager.downloadImageAndGetPath
 import com.snazhmudinov.movies.models.Cast
 import com.snazhmudinov.movies.models.CastList
 import com.snazhmudinov.movies.models.Movie
+import com.snazhmudinov.movies.models.Trailer
 import kotlinx.android.synthetic.main.movie_content.*
 import kotlinx.android.synthetic.main.movie_fragment.*
 import retrofit2.Call
@@ -109,6 +110,35 @@ class MovieFragment: BaseMovieFragment(), View.OnClickListener, DownloadInterfac
         })
     }
 
+    private fun playTrailer(movie : Movie) {
+        val service = mRetrofit.create(MoviesEndPointsInterface::class.java)
+        val call = service.getYouTubeTrailer(movie.id.toString(), Constants.API_KEY)
+
+        call.enqueue(object : retrofit2.Callback<Trailer> {
+            override fun onResponse(call: Call<Trailer>, response: Response<Trailer>) {
+                if (response.isSuccessful) {
+                    val responseResults = response.body()?.results
+
+                    if (responseResults?.isNotEmpty() as Boolean) {
+                        responseResults.let {
+                            val url = it[0].trailerURL
+                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                        }
+                    } else {
+                        errorToast(R.string.no_trailer_error)
+                    }
+
+                } else {
+                    errorToast(R.string.unsuccessful_response)
+                }
+            }
+
+            override fun onFailure(call: Call<Trailer>, t: Throwable) {
+                errorToast(R.string.error_call)
+            }
+        })
+    }
+
     override fun onClick(v: View?) {
         when(v?.id) {
             R.id.fab -> {
@@ -124,7 +154,7 @@ class MovieFragment: BaseMovieFragment(), View.OnClickListener, DownloadInterfac
 
             R.id.trailer_icon -> {
                 movie?.let {
-                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it.trailer)))
+                    playTrailer(it)
                 }
             }
 

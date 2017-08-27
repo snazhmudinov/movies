@@ -24,8 +24,6 @@ import retrofit2.Response
 class MoviesListFragment: BaseMovieFragment() {
 
     var currentSelection: String = ""
-    var mFetchedMovies: MutableList<Movie> = ArrayList()
-    private val mMap = HashMap<Int, String>()
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?) =
             inflater?.inflate(R.layout.fragment_movies_list, container, false)
@@ -41,19 +39,20 @@ class MoviesListFragment: BaseMovieFragment() {
         fetchMovies(currentSelection)
     }
 
-    fun initLayoutManager() {
+    private fun initLayoutManager() {
         //Layout manager region
         val mLayoutManager = GridLayoutManager(context, 2)
         moviesRecyclerView.layoutManager = mLayoutManager
     }
 
-    fun populateAdapter(movies: MutableList<Movie>) {
+    fun populateAdapter(movies: MutableList<Movie>, isLocalImage: Boolean = false) {
         //Populate & set adapter
         val adapter = MoviesAdapter(movies, context)
+        adapter.setLocalImage(isLocalImage)
         moviesRecyclerView.adapter = adapter
     }
     
-    fun getCategoryForId(key: Int) = Category.values().filter { it.id == key }.first().name
+    fun getCategoryForId(key: Int) = Category.values().first { it.id == key }.name
 
     fun getIdOfCategory(category: String) = Category.valueOf(category).id
 
@@ -63,7 +62,7 @@ class MoviesListFragment: BaseMovieFragment() {
         when(category) {
             Category.favorite.name -> {
                 if (mDatabaseManager.tableHasRecords()) {
-                    populateAdapter(mDatabaseManager.getAllRecords())
+                    populateAdapter(mDatabaseManager.getAllRecords(), isLocalImage = true)
                 }
             }
 

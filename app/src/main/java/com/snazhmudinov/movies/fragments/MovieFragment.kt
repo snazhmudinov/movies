@@ -39,10 +39,12 @@ class MovieFragment: BaseMovieFragment(), View.OnClickListener, DownloadInterfac
         super.onViewCreated(view, savedInstanceState)
 
         movie = activity.intent.getParcelableExtra(Constants.MOVIE_KEY)
+        val isLocalPoster = activity.intent.getBooleanExtra(Constants.LOCAL_POSTER, false)
 
         movie?.let {
             toolbar_layout.title = it.originalTitle
-            poster_container.setImageURI(Uri.parse(Constants.POSTER_BASE_URL + it.posterPath))
+            val posterPath = if (isLocalPoster) Uri.parse(it.posterPath) else it.webPosterPath
+            poster_container.setImageURI(posterPath)
             setFocusCropRect()
             getCast(it)
             configureToolbar()

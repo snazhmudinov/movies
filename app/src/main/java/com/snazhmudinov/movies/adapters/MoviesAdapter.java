@@ -25,6 +25,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolde
 
     private List<Movie> moviesList;
     private Context mContext;
+    private boolean isLocalImage = false;
 
     public MoviesAdapter(List<Movie> movies, Context context) {
         moviesList = movies;
@@ -42,7 +43,10 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolde
     @Override
     public void onBindViewHolder(MovieHolder holder, int position) {
         Movie currentMovie = moviesList.get(position);
-        holder.mPosterView.setImageURI(Uri.parse(Constants.POSTER_BASE_URL + currentMovie.getPosterPath()));
+        Uri uri = isLocalImage ? Uri.parse(currentMovie.getPosterPath()) :
+                Uri.parse(Constants.POSTER_BASE_URL + currentMovie.getPosterPath());
+
+        holder.mPosterView.setImageURI(uri);
     }
 
     @Override
@@ -69,7 +73,12 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolde
 
             Intent intent = new Intent(context, MovieActivity.class);
             intent.putExtra(Constants.MOVIE_KEY, movie);
+            intent.putExtra(Constants.LOCAL_POSTER, isLocalImage);
             context.startActivity(intent);
         }
+    }
+
+    public void setLocalImage(boolean value) {
+        isLocalImage = value;
     }
 }

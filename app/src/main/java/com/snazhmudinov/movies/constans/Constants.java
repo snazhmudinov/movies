@@ -14,6 +14,7 @@ public final class Constants {
     public static final String CATEGORY_POPULAR = "popular";
 
     public static final String MOVIE_KEY = "MOVIE_KEY";
+    public static final String LOCAL_POSTER = "LOCAL_POSTER";
 
     //YouTube base URL and API key
     public static final String YOUTUBE_API_KEY = "AIzaSyDUqvEbxRrZEr2azhE90Wm3UO_ZDxDjHzA";

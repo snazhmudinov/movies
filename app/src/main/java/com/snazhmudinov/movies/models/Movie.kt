@@ -18,7 +18,7 @@ data class Movie(@SerializedName("poster_path") var posterPath: String,
                  @SerializedName("popularity") val popularity: Double,
                  @SerializedName("vote_count") val voteCount: Int): Parcelable {
 
-    val poster: Uri?
+    val webPosterPath: Uri?
         get() = Uri.parse(Constants.POSTER_BASE_URL + posterPath)
 
     var trailer: String? = null

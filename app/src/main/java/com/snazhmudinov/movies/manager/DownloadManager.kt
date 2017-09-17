@@ -2,13 +2,11 @@ package com.snazhmudinov.movies.manager
 
 import android.content.Context
 import android.database.Cursor
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.provider.MediaStore
 import com.snazhmudinov.movies.models.Movie
-import com.squareup.picasso.Picasso
-import com.squareup.picasso.Target
+import okhttp3.*
 import java.io.*
 
 /**
@@ -20,22 +18,26 @@ interface DownloadInterface {
 }
 
 fun downloadImageAndGetPath(context: Context, movie: Movie, downloadInterface: DownloadInterface) {
+    val client = OkHttpClient()
+    val request = Request.Builder()
+            .url(movie.webPosterPath.toString())
+            .build()
 
-    Picasso.with(context).load(movie.webPosterPath).into(object: Target {
-        override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-        }
-
-        override fun onBitmapFailed(errorDrawable: Drawable?) {
-        }
-
-        override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-            val bytes = ByteArrayOutputStream()
-
-            if (bitmap?.compress(Bitmap.CompressFormat.JPEG, 100, bytes) ?: false) {
-                val path = MediaStore.Images.Media.insertImage(context.contentResolver, bitmap, "", null)
-                movie.posterPath = path
-                downloadInterface.downloadFinished()
+    client.newCall(request).enqueue(object : Callback {
+        override fun onResponse(call: Call?, response: Response?) {
+            if (response?.isSuccessful ?: false) {
+                response?.let {
+                    val bytes = it.body()?.bytes()
+                    val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes?.size ?: 0)
+                    val path = MediaStore.Images.Media.insertImage(context.contentResolver, bitmap, "", null)
+                    movie.posterPath = path
+                    downloadInterface.downloadFinished()
+                }
             }
+        }
+
+        override fun onFailure(call: Call?, e: IOException?) {
+            e?.printStackTrace()
         }
     })
 }

@@ -36,7 +36,7 @@ public class  MovieListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_list);
-        ((MovieApplication)getApplication()).getNetworkComponents().inject(this);
+        ((MovieApplication)getApplication()).getAppComponents().inject(this);
         ButterKnife.bind(this);
 
         mMoviesListFragment = (MoviesListFragment) getSupportFragmentManager()
@@ -58,11 +58,13 @@ public class  MovieListActivity extends AppCompatActivity {
         });
 
         //Set click listeners to nav items
-        mNavView.setCheckedItem(mMoviesListFragment.getKeyForValue(mMoviesListFragment.getCurrentSelection()));
+        final int currentId = mMoviesListFragment.getIdOfCategory(mMoviesListFragment.getCurrentSelection());
+        mNavView.setCheckedItem(currentId);
         mNavView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                final String category = mMoviesListFragment.getValueFor(item.getItemId());
+                final String category = mMoviesListFragment.getCategoryForId(item.getItemId());
+
                 mMoviesListFragment.fetchMovies(category);
                 item.setChecked(true);
                 mParentView.closeDrawers();

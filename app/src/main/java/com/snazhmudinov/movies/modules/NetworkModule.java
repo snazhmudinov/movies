@@ -1,6 +1,10 @@
 package com.snazhmudinov.movies.modules;
 
+import android.content.Context;
+
 import com.snazhmudinov.movies.constans.Constants;
+import com.snazhmudinov.movies.database.DatabaseManager;
+
 import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;

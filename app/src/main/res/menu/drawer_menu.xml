@@ -21,4 +21,9 @@
         android:checkable="true"
         android:icon="@drawable/ic_local_movies" />
 
+    <item android:id="@+id/action_favorite"
+        android:title="@string/favorite"
+        android:checkable="true"
+        android:icon="@drawable/ic_local_movies" />
+
 </menu>

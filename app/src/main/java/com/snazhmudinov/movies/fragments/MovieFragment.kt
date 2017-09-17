@@ -16,6 +16,7 @@ import com.snazhmudinov.movies.adapters.CastAdapter
 import com.snazhmudinov.movies.constans.Constants
 import com.snazhmudinov.movies.endpoints.MoviesEndPointsInterface
 import com.snazhmudinov.movies.manager.DownloadInterface
+import com.snazhmudinov.movies.manager.deleteImageFromMediaStore
 import com.snazhmudinov.movies.manager.downloadImageAndGetPath
 import com.snazhmudinov.movies.models.Cast
 import com.snazhmudinov.movies.models.CastList
@@ -24,6 +25,7 @@ import com.snazhmudinov.movies.models.Trailer
 import kotlinx.android.synthetic.main.movie_content.*
 import kotlinx.android.synthetic.main.movie_fragment.*
 import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Response
 
 /**
@@ -144,8 +146,10 @@ class MovieFragment: BaseMovieFragment(), View.OnClickListener, DownloadInterfac
             R.id.fab -> {
                 movie?.let {
                     if (mDatabaseManager.isMovieInDatabase(it)) {
-                        mDatabaseManager.deleteMovieFromDb(it)
-                        configureFab(mDatabaseManager.isMovieInDatabase(it))
+                        if (deleteImageFromMediaStore(context, it.posterPath)) {
+                            mDatabaseManager.deleteMovieFromDb(it)
+                            configureFab(mDatabaseManager.isMovieInDatabase(it))
+                        }
                     } else {
                         downloadImageAndGetPath(context, it, this)
                     }

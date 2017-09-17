@@ -18,6 +18,7 @@ import java.io.*
 interface DownloadInterface {
     fun downloadFinished()
 }
+
 fun downloadImageAndGetPath(context: Context, movie: Movie, downloadInterface: DownloadInterface) {
 
     Picasso.with(context).load(movie.webPosterPath).into(object: Target {
@@ -39,12 +40,22 @@ fun downloadImageAndGetPath(context: Context, movie: Movie, downloadInterface: D
     })
 }
 
+fun deleteImageFromMediaStore(context: Context, path: String): Boolean {
+    val fileToDelete = File(getRealPathFromURI(context, Uri.parse(path)))
+
+    if (fileToDelete.exists()) {
+        return fileToDelete.delete()
+    }
+
+    return false
+}
+
 private fun getRealPathFromURI(context: Context, contentUri: Uri): String {
     var cursor: Cursor? = null
     try {
         val proj = arrayOf(MediaStore.Images.Media.DATA)
         cursor = context.contentResolver.query(contentUri, proj, null, null, null)
-        val column_index = cursor!!.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+        val column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
         cursor.moveToFirst()
         return cursor.getString(column_index)
     } finally {

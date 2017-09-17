@@ -48,9 +48,16 @@ class DatabaseManager(val context: Context) {
         }
     }
 
-    fun tableHasRecords() = context.database.use {
-        select(MoviesDatabaseHelper.TABLE_NAME, "*").exec {
-            moveToFirst()
+    fun adjustToLocalPoster(movie: Movie) {
+        context.database.use {
+            select(MoviesDatabaseHelper.TABLE_NAME)
+                    .whereArgs("${movie.id} == ${MoviesDatabaseHelper.COLUMN_MOVIE_ID}")
+                    .exec {
+                        if (moveToFirst()) {
+                            val posterPath = getString(getColumnIndex(MoviesDatabaseHelper.COLUMN_POSTER_LINK))
+                            movie.posterPath = posterPath
+                        }
+                    }
         }
     }
 

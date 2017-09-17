@@ -35,6 +35,7 @@ import retrofit2.Response
 class MovieFragment: BaseMovieFragment(), View.OnClickListener, DownloadInterface {
 
     var movie: Movie? = null
+    private var isLocalPoster = false
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?) =
             inflater?.inflate(R.layout.movie_fragment, container, false)
@@ -43,7 +44,7 @@ class MovieFragment: BaseMovieFragment(), View.OnClickListener, DownloadInterfac
         super.onViewCreated(view, savedInstanceState)
 
         movie = activity.intent.getParcelableExtra(Constants.MOVIE_KEY)
-        val isLocalPoster = activity.intent.getBooleanExtra(Constants.LOCAL_POSTER, false)
+        isLocalPoster = activity.intent.getBooleanExtra(Constants.LOCAL_POSTER, false)
 
         movie?.let {
             toolbar_layout.title = it.originalTitle
@@ -147,12 +148,17 @@ class MovieFragment: BaseMovieFragment(), View.OnClickListener, DownloadInterfac
             R.id.fab -> {
                 movie?.let {
                     if (mDatabaseManager.isMovieInDatabase(it)) {
+                        if (!isLocalPoster) { mDatabaseManager.adjustToLocalPoster(it) }
                         if (deleteImageFromMediaStore(context, it.posterPath)) {
                             mDatabaseManager.deleteMovieFromDb(it)
-                            val intent = Intent()
-                            intent.putExtra(Constants.MOVIE_TO_DELETE, it)
-                            (context as MovieActivity).setResult(Activity.RESULT_OK, intent)
-                            (context as MovieActivity).finish()
+                            configureFab(mDatabaseManager.isMovieInDatabase(it))
+                            //If we delete the movie and should land in fav categories
+                            if (isLocalPoster) {
+                                val intent = Intent()
+                                intent.putExtra(Constants.MOVIE_TO_DELETE, it)
+                                (context as MovieActivity).setResult(Activity.RESULT_OK, intent)
+                                (context as MovieActivity).finish()
+                            }
                         }
                     } else {
                         downloadImageAndGetPath(context, it, this)

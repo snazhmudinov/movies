@@ -1,5 +1,6 @@
 package com.snazhmudinov.movies.fragments
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.PointF
 import android.net.Uri
@@ -148,6 +149,9 @@ class MovieFragment: BaseMovieFragment(), View.OnClickListener, DownloadInterfac
                     if (mDatabaseManager.isMovieInDatabase(it)) {
                         if (deleteImageFromMediaStore(context, it.posterPath)) {
                             mDatabaseManager.deleteMovieFromDb(it)
+                            val intent = Intent()
+                            intent.putExtra(Constants.MOVIE_TO_DELETE, it)
+                            (context as MovieActivity).setResult(Activity.RESULT_OK, intent)
                             (context as MovieActivity).finish()
                         }
                     } else {

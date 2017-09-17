@@ -1,5 +1,7 @@
 package com.snazhmudinov.movies.fragments
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.view.LayoutInflater
@@ -7,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.snazhmudinov.movies.R
+import com.snazhmudinov.movies.activities.MovieActivity
 import com.snazhmudinov.movies.adapters.MoviesAdapter
 import com.snazhmudinov.movies.constans.Constants
 import com.snazhmudinov.movies.endpoints.MoviesEndPointsInterface
@@ -21,10 +24,11 @@ import retrofit2.Response
 /**
  * Created by snazhmudinov on 7/9/17.
  */
-class MoviesListFragment: BaseMovieFragment() {
+class MoviesListFragment: BaseMovieFragment(), MoviesAdapter.MovieInterface {
 
     var currentSelection: String = ""
-    var adapter: MoviesAdapter? = null
+    private lateinit var adapter: MoviesAdapter
+    private lateinit var movies: MutableList<Movie>
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?) =
             inflater?.inflate(R.layout.fragment_movies_list, container, false)
@@ -46,12 +50,39 @@ class MoviesListFragment: BaseMovieFragment() {
         moviesRecyclerView.layoutManager = mLayoutManager
     }
 
-    fun populateAdapter(movies: MutableList<Movie>, isLocalImage: Boolean = false) {
+    fun populateAdapter(isLocalImage: Boolean = false) {
         //Populate & set adapter
         adapter = MoviesAdapter(movies, context)
-        adapter?.let {
+        adapter.let {
+            it.movieInterface = this
             it.setLocalImage(isLocalImage)
             moviesRecyclerView.adapter = it
+        }
+    }
+
+    override fun onMovieSelected(movie: Movie?, isLocalImage: Boolean) {
+        movie?.let {
+            val intent = Intent(context, MovieActivity::class.java)
+            intent.putExtra(Constants.MOVIE_KEY, it)
+            intent.putExtra(Constants.LOCAL_POSTER, isLocalImage)
+            startActivityForResult(intent, Constants.DELETE_REQUEST_CODE)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        when(requestCode) {
+            Constants.DELETE_REQUEST_CODE -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    val movie = data?.getParcelableExtra<Movie>(Constants.MOVIE_TO_DELETE)
+                    movie?.let {
+                       val index = movies.indexOf(movie)
+                       movies.remove(movie)
+                       adapter.notifyItemRemoved(index)
+                    }
+                }
+            }
         }
     }
     
@@ -65,7 +96,8 @@ class MoviesListFragment: BaseMovieFragment() {
         when(category) {
             Category.favorite.name -> {
                 if (mDatabaseManager.tableHasRecords()) {
-                    populateAdapter(mDatabaseManager.getAllRecords(), isLocalImage = true)
+                    movies = mDatabaseManager.getAllRecords()
+                    populateAdapter(isLocalImage = true)
                 }
             }
 
@@ -77,7 +109,10 @@ class MoviesListFragment: BaseMovieFragment() {
                     override fun onResponse(call: Call<MovieResponse>, response: Response<MovieResponse>) {
                         if (response.isSuccessful) {
                             //Get response -> Populate the adapter
-                            response.body()?.let { populateAdapter(it.results) }
+                            response.body()?.let {
+                                movies = it.results
+                                populateAdapter()
+                            }
 
                         } else {
                             Toast.makeText(activity, R.string.unsuccessful_response, Toast.LENGTH_SHORT).show()

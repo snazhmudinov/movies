@@ -1,7 +1,6 @@
 package com.snazhmudinov.movies.adapters;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.snazhmudinov.movies.R;
-import com.snazhmudinov.movies.activities.MovieActivity;
 import com.snazhmudinov.movies.constans.Constants;
 import com.snazhmudinov.movies.models.Movie;
 import java.util.List;
@@ -23,9 +21,14 @@ import butterknife.OnClick;
 
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolder> {
 
+    public interface MovieInterface {
+        void onMovieSelected(Movie movie, boolean isLocalImage);
+    }
+
     private List<Movie> moviesList;
     private Context mContext;
     private boolean isLocalImage = false;
+    public MovieInterface movieInterface;
 
     public MoviesAdapter(List<Movie> movies, Context context) {
         moviesList = movies;
@@ -37,7 +40,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolde
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View view = inflater.inflate(R.layout.movie_rv_item, parent, false);
 
-        return new MovieHolder(view, mContext);
+        return new MovieHolder(view);
     }
 
     @Override
@@ -55,14 +58,12 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolde
     }
 
     class MovieHolder extends RecyclerView.ViewHolder {
-        private Context context;
 
         @BindView(R.id.poster)
         SimpleDraweeView mPosterView;
 
-        MovieHolder(View itemView, Context context) {
+        MovieHolder(View itemView) {
             super(itemView);
-            this.context = context;
 
             ButterKnife.bind(this, itemView);
         }
@@ -70,11 +71,9 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolde
         @OnClick(R.id.poster)
         void openMovieDetails() {
             Movie movie = moviesList.get(getAdapterPosition());
-
-            Intent intent = new Intent(context, MovieActivity.class);
-            intent.putExtra(Constants.MOVIE_KEY, movie);
-            intent.putExtra(Constants.LOCAL_POSTER, isLocalImage);
-            context.startActivity(intent);
+            if (movieInterface != null) {
+                movieInterface.onMovieSelected(movie, isLocalImage);
+            }
         }
     }
 

@@ -15,6 +15,10 @@ public final class Constants {
 
     public static final String MOVIE_KEY = "MOVIE_KEY";
     public static final String LOCAL_POSTER = "LOCAL_POSTER";
+    public static final String MOVIE_TO_DELETE = "MOVIE_TO_DELETE";
+
+    //Request codes
+    public static final int DELETE_REQUEST_CODE = 88;
 
     //YouTube base URL and API key
     public static final String YOUTUBE_API_KEY = "AIzaSyDUqvEbxRrZEr2azhE90Wm3UO_ZDxDjHzA";

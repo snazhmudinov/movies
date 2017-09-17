@@ -24,6 +24,7 @@ import retrofit2.Response
 class MoviesListFragment: BaseMovieFragment() {
 
     var currentSelection: String = ""
+    var adapter: MoviesAdapter? = null
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?) =
             inflater?.inflate(R.layout.fragment_movies_list, container, false)
@@ -47,9 +48,11 @@ class MoviesListFragment: BaseMovieFragment() {
 
     fun populateAdapter(movies: MutableList<Movie>, isLocalImage: Boolean = false) {
         //Populate & set adapter
-        val adapter = MoviesAdapter(movies, context)
-        adapter.setLocalImage(isLocalImage)
-        moviesRecyclerView.adapter = adapter
+        adapter = MoviesAdapter(movies, context)
+        adapter?.let {
+            it.setLocalImage(isLocalImage)
+            moviesRecyclerView.adapter = it
+        }
     }
     
     fun getCategoryForId(key: Int) = Category.values().first { it.id == key }.name

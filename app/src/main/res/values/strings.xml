@@ -24,4 +24,5 @@
     <string name="failure_deleting_movie">Failed to delete the movie from database</string>
 
     <string name="empty_table_error">You didn\'t store any movie</string>
+    <string name="no_fav_movies_title">No favorite movies saved</string>
 </resources>

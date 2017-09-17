@@ -53,6 +53,7 @@ class MoviesListFragment: BaseMovieFragment(), MoviesAdapter.MovieInterface {
     fun populateAdapter(isLocalImage: Boolean = false) {
         //Populate & set adapter
         adapter = MoviesAdapter(movies, context)
+        toggleEmptyView(movies.isEmpty())
         adapter.let {
             it.movieInterface = this
             it.setLocalImage(isLocalImage)
@@ -80,6 +81,7 @@ class MoviesListFragment: BaseMovieFragment(), MoviesAdapter.MovieInterface {
                        val index = movies.indexOf(movie)
                        movies.remove(movie)
                        adapter.notifyItemRemoved(index)
+                       toggleEmptyView(movies.isEmpty())
                     }
                 }
             }
@@ -95,10 +97,8 @@ class MoviesListFragment: BaseMovieFragment(), MoviesAdapter.MovieInterface {
 
         when(category) {
             Category.favorite.name -> {
-                if (mDatabaseManager.tableHasRecords()) {
-                    movies = mDatabaseManager.getAllRecords()
-                    populateAdapter(isLocalImage = true)
-                }
+                movies = mDatabaseManager.getAllRecords()
+                populateAdapter(isLocalImage = true)
             }
 
             else -> {
@@ -124,6 +124,16 @@ class MoviesListFragment: BaseMovieFragment(), MoviesAdapter.MovieInterface {
                     }
                 })
             }
+        }
+    }
+
+    private fun toggleEmptyView(show: Boolean) {
+        empty_rv_container.visibility = if (show) {
+            moviesRecyclerView.visibility = View.GONE
+            View.VISIBLE
+        } else {
+            moviesRecyclerView.visibility = View.VISIBLE
+            View.GONE
         }
     }
 }

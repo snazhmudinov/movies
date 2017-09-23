@@ -8,6 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.evernote.android.state.State
+import com.evernote.android.state.StateSaver
 import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.activities.MovieActivity
 import com.snazhmudinov.movies.adapters.MoviesAdapter
@@ -26,13 +28,19 @@ import retrofit2.Response
  */
 class MoviesListFragment: BaseMovieFragment(), MoviesAdapter.MovieInterface {
 
-    var currentSelection: String = ""
+    @State var currentSelection: String = ""
     private lateinit var adapter: MoviesAdapter
     private lateinit var movies: MutableList<Movie>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        StateSaver.restoreInstanceState(this, savedInstanceState)
         retainInstance = true
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        StateSaver.saveInstanceState(this, outState as Bundle)
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?) =

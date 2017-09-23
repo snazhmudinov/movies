@@ -30,6 +30,11 @@ class MoviesListFragment: BaseMovieFragment(), MoviesAdapter.MovieInterface {
     private lateinit var adapter: MoviesAdapter
     private lateinit var movies: MutableList<Movie>
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        retainInstance = true
+    }
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?) =
             inflater?.inflate(R.layout.fragment_movies_list, container, false)
 

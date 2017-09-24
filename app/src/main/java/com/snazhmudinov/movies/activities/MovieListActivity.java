@@ -9,9 +9,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
+
 import com.snazhmudinov.movies.R;
 import com.snazhmudinov.movies.application.MovieApplication;
+import com.snazhmudinov.movies.fragments.MovieFragment;
 import com.snazhmudinov.movies.fragments.MoviesListFragment;
+import com.snazhmudinov.movies.models.Movie;
+
 import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -41,6 +46,7 @@ public class  MovieListActivity extends AppCompatActivity {
 
         mMoviesListFragment = (MoviesListFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.movies_list_fragment);
+        mMoviesListFragment.setLandOrientation(findViewById(R.id.movie_fragment) != null);
 
         setupDrawerContent();
     }
@@ -71,5 +77,11 @@ public class  MovieListActivity extends AppCompatActivity {
                 return true;
             }
         });
+    }
+
+    public void displayMovie(@NonNull MovieFragment movie) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.movie_fragment, movie)
+                .commit();
     }
 }

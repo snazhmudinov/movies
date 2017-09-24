@@ -7,11 +7,13 @@ import android.support.v7.widget.GridLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Toast
 import com.evernote.android.state.State
 import com.evernote.android.state.StateSaver
 import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.activities.MovieActivity
+import com.snazhmudinov.movies.activities.MovieListActivity
 import com.snazhmudinov.movies.adapters.MoviesAdapter
 import com.snazhmudinov.movies.constans.Constants
 import com.snazhmudinov.movies.endpoints.MoviesEndPointsInterface
@@ -29,6 +31,7 @@ import retrofit2.Response
 class MoviesListFragment: BaseMovieFragment(), MoviesAdapter.MovieInterface {
 
     @State var currentSelection: String = ""
+    @State var isLandOrientation = false
     private lateinit var adapter: MoviesAdapter
     private lateinit var movies: MutableList<Movie>
 
@@ -76,10 +79,15 @@ class MoviesListFragment: BaseMovieFragment(), MoviesAdapter.MovieInterface {
 
     override fun onMovieSelected(movie: Movie?, isLocalImage: Boolean) {
         movie?.let {
-            val intent = Intent(context, MovieActivity::class.java)
-            intent.putExtra(Constants.MOVIE_KEY, it)
-            intent.putExtra(Constants.LOCAL_POSTER, isLocalImage)
-            startActivityForResult(intent, Constants.DELETE_REQUEST_CODE)
+            if (isLandOrientation) {
+                val fragment = MovieFragment.newInstance(it, isLocalImage)
+                (activity as MovieListActivity).displayMovie(fragment)
+            } else {
+                val intent = Intent(context, MovieActivity::class.java)
+                intent.putExtra(Constants.MOVIE_KEY, it)
+                intent.putExtra(Constants.LOCAL_POSTER, isLocalImage)
+                startActivityForResult(intent, Constants.DELETE_REQUEST_CODE)
+            }
         }
     }
 

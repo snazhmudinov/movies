@@ -37,17 +37,36 @@ class MovieFragment: BaseMovieFragment(), View.OnClickListener, DownloadInterfac
     var movie: Movie? = null
     private var isLocalPoster = false
 
+    companion object {
+        val ARG_MOVIE = "ARG_MOVIE"
+        val ARG_FLAG = "ARG_FLAG"
+
+        fun newInstance(movie: Movie, isLocalPoster: Boolean): MovieFragment {
+            val bundle = Bundle()
+            bundle.putParcelable(ARG_MOVIE, movie)
+            bundle.putBoolean(ARG_FLAG, isLocalPoster)
+            val fragment = MovieFragment()
+            fragment.arguments = bundle
+            return fragment
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        retainInstance = true
+    }
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?) =
             inflater?.inflate(R.layout.movie_fragment, container, false)
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        movie = activity.intent.getParcelableExtra(Constants.MOVIE_KEY)
-        isLocalPoster = activity.intent.getBooleanExtra(Constants.LOCAL_POSTER, false)
+        movie = arguments.getParcelable(ARG_MOVIE)
+        isLocalPoster = arguments.getBoolean(ARG_FLAG, false)
 
         movie?.let {
-            toolbar_layout.title = it.originalTitle
+            toolbar_layout?.title = it.originalTitle
             val posterPath = if (isLocalPoster) Uri.parse(it.posterPath) else it.webPosterPath
             poster_container.setImageURI(posterPath)
             setFocusCropRect()
@@ -81,7 +100,7 @@ class MovieFragment: BaseMovieFragment(), View.OnClickListener, DownloadInterfac
 
     private fun configureToolbar() {
         (activity as AppCompatActivity).setSupportActionBar(movie_toolbar)
-        movie_toolbar.setNavigationOnClickListener {
+        movie_toolbar?.setNavigationOnClickListener {
             activity.finish()
         }
     }

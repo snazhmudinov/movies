@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.PointF
 import android.net.Uri
 import android.os.Bundle
+import android.support.annotation.UiThread
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -13,7 +14,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.snazhmudinov.movies.R
-import com.snazhmudinov.movies.activities.MovieActivity
 import com.snazhmudinov.movies.adapters.CastAdapter
 import com.snazhmudinov.movies.constans.Constants
 import com.snazhmudinov.movies.endpoints.MoviesEndPointsInterface
@@ -24,7 +24,6 @@ import com.snazhmudinov.movies.models.Cast
 import com.snazhmudinov.movies.models.CastList
 import com.snazhmudinov.movies.models.Movie
 import com.snazhmudinov.movies.models.Trailer
-import kotlinx.android.synthetic.main.movie_content.*
 import kotlinx.android.synthetic.main.movie_fragment.*
 import retrofit2.Call
 import retrofit2.Response
@@ -37,19 +36,36 @@ class MovieFragment: BaseMovieFragment(), View.OnClickListener, DownloadInterfac
     var movie: Movie? = null
     private var isLocalPoster = false
 
+    companion object {
+        val ARG_MOVIE = "ARG_MOVIE"
+        val ARG_FLAG = "ARG_FLAG"
+
+        fun newInstance(movie: Movie, isLocalPoster: Boolean): MovieFragment {
+            val bundle = Bundle()
+            bundle.putParcelable(ARG_MOVIE, movie)
+            bundle.putBoolean(ARG_FLAG, isLocalPoster)
+            val fragment = MovieFragment()
+            fragment.arguments = bundle
+            return fragment
+        }
+    }
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?) =
             inflater?.inflate(R.layout.movie_fragment, container, false)
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        movie = activity.intent.getParcelableExtra(Constants.MOVIE_KEY)
-        isLocalPoster = activity.intent.getBooleanExtra(Constants.LOCAL_POSTER, false)
+        movie = arguments.getParcelable(ARG_MOVIE)
+        isLocalPoster = arguments.getBoolean(ARG_FLAG, false)
 
         movie?.let {
-            toolbar_layout.title = it.originalTitle
+            toolbar_layout?.title = it.originalTitle
+            movie_name?.text = it.originalTitle
+
             val posterPath = if (isLocalPoster) Uri.parse(it.posterPath) else it.webPosterPath
             poster_container.setImageURI(posterPath)
+
             setFocusCropRect()
             getCast(it)
             configureToolbar()
@@ -59,13 +75,14 @@ class MovieFragment: BaseMovieFragment(), View.OnClickListener, DownloadInterfac
         fab?.setOnClickListener(this)
         trailer_icon?.setOnClickListener(this)
         actors_drop_down?.setOnClickListener(this)
-
     }
 
     fun setupMovieCast(castList : List<Cast>) {
-        cast_recycler_view.layoutManager = LinearLayoutManager(context)
-        val castAdapter = CastAdapter(castList, context)
-        cast_recycler_view.adapter = castAdapter
+        context?.let {
+            val castAdapter = CastAdapter(castList, context)
+            cast_recycler_view?.layoutManager = LinearLayoutManager(context)
+            cast_recycler_view?.adapter = castAdapter
+        }
     }
 
     private fun displaySnackbar() {
@@ -81,7 +98,7 @@ class MovieFragment: BaseMovieFragment(), View.OnClickListener, DownloadInterfac
 
     private fun configureToolbar() {
         (activity as AppCompatActivity).setSupportActionBar(movie_toolbar)
-        movie_toolbar.setNavigationOnClickListener {
+        movie_toolbar?.setNavigationOnClickListener {
             activity.finish()
         }
     }
@@ -156,8 +173,8 @@ class MovieFragment: BaseMovieFragment(), View.OnClickListener, DownloadInterfac
                             if (isLocalPoster) {
                                 val intent = Intent()
                                 intent.putExtra(Constants.MOVIE_TO_DELETE, it)
-                                (context as MovieActivity).setResult(Activity.RESULT_OK, intent)
-                                (context as MovieActivity).finish()
+                                activity.setResult(Activity.RESULT_OK, intent)
+                                activity.finish()
                             }
                         }
                     } else {
@@ -173,21 +190,23 @@ class MovieFragment: BaseMovieFragment(), View.OnClickListener, DownloadInterfac
             }
 
             R.id.actors_drop_down -> {
-                val visibility = cast_recycler_view.visibility
-                cast_recycler_view.visibility = if (visibility == View.VISIBLE) View.GONE else View.VISIBLE
+                val visibility = cast_recycler_view?.visibility
+                cast_recycler_view?.visibility = if (visibility == View.VISIBLE) View.GONE else View.VISIBLE
 
-                val drawable = if (cast_recycler_view.visibility == View.VISIBLE) R.drawable.ic_arrow_drop_up
+                val drawable = if (cast_recycler_view?.visibility == View.VISIBLE) R.drawable.ic_arrow_drop_up
                 else R.drawable.ic_arrow_drop_down
-                actors_drop_down.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawable, 0)
+                actors_drop_down?.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawable, 0)
             }
         }
     }
 
     override fun downloadFinished() {
-        movie?.let {
-            mDatabaseManager.insertMovieIntoDB(it)
-            configureFab(mDatabaseManager.isMovieInDatabase(it))
-            displaySnackbar()
+        activity.runOnUiThread {
+            movie?.let {
+                mDatabaseManager.insertMovieIntoDB(it)
+                configureFab(mDatabaseManager.isMovieInDatabase(it))
+                displaySnackbar()
+            }
         }
     }
 

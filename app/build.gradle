@@ -1,6 +1,7 @@
 buildscript {
     repositories {
         maven { url 'https://maven.fabric.io/public' }
+        maven { url 'https://maven.google.com' }
     }
 
     dependencies {
@@ -60,6 +61,7 @@ dependencies {
     compile 'org.jetbrains.anko:anko-sqlite:0.10.0'
     compile 'com.evernote:android-state:1.1.5'
     kapt 'com.evernote:android-state-processor:1.1.5'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
 }
 repositories {
     mavenCentral()

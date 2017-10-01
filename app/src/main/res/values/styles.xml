@@ -9,7 +9,7 @@
     </style>
 
     <style name="MoviesTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="android:windowFullscreen">true</item>
     </style>
 
     <style name="MoviesTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

@@ -24,9 +24,7 @@ class CastAdapter(val castList : List<Cast>, val context: Context) : RecyclerVie
         return CastHolder(view)
     }
 
-    override fun getItemCount(): Int {
-        return castList.size
-    }
+    override fun getItemCount() = castList.size
 
     override fun onBindViewHolder(holder: CastHolder?, position: Int) {
         val cast = castList[position]

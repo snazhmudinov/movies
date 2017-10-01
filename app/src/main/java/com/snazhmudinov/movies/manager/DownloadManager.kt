@@ -7,7 +7,8 @@ import android.net.Uri
 import android.provider.MediaStore
 import com.snazhmudinov.movies.models.Movie
 import okhttp3.*
-import java.io.*
+import java.io.File
+import java.io.IOException
 
 /**
  * Created by snazhmudinov on 7/25/17.
@@ -30,7 +31,7 @@ fun downloadImageAndGetPath(context: Context, movie: Movie, downloadInterface: D
                     val bytes = it.body()?.bytes()
                     val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes?.size ?: 0)
                     val path = MediaStore.Images.Media.insertImage(context.contentResolver, bitmap, "", null)
-                    movie.posterPath = path
+                    movie.savedFilePath = path
                     downloadInterface.downloadFinished()
                 }
             }

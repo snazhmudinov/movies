@@ -3,37 +3,41 @@ package com.snazhmudinov.movies.fragments
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import com.evernote.android.state.State
 import com.evernote.android.state.StateSaver
 import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.activities.MovieActivity
 import com.snazhmudinov.movies.adapters.MoviesAdapter
+import com.snazhmudinov.movies.application.MovieApplication
 import com.snazhmudinov.movies.constans.Constants
-import com.snazhmudinov.movies.endpoints.MoviesEndPointsInterface
+import com.snazhmudinov.movies.database.DatabaseManager
 import com.snazhmudinov.movies.enum.Category
+import com.snazhmudinov.movies.manager.MovieManager
 import com.snazhmudinov.movies.models.Movie
-import com.snazhmudinov.movies.models.MovieResponse
 import kotlinx.android.synthetic.main.fragment_movies_list.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import javax.inject.Inject
 
 /**
  * Created by snazhmudinov on 7/9/17.
  */
-class MoviesListFragment: BaseMovieFragment(), MoviesAdapter.MovieInterface {
+class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
+
+    @Inject lateinit var mMovieManager: MovieManager
+    @Inject lateinit var mDatabaseManager: DatabaseManager
 
     @State var currentSelection: String = ""
+    private lateinit var dataset: MutableList<Movie>
     private lateinit var adapter: MoviesAdapter
-    private lateinit var movies: MutableList<Movie>
+    private var movieToDelete: Movie? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        (activity.application as MovieApplication).appComponents.inject(this)
         StateSaver.restoreInstanceState(this, savedInstanceState)
         retainInstance = true
     }
@@ -48,13 +52,11 @@ class MoviesListFragment: BaseMovieFragment(), MoviesAdapter.MovieInterface {
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         initLayoutManager()
-
         //if nothing to restore, default the selection
         if (currentSelection.isEmpty()) {
             currentSelection = Category.popular.name
         }
-
-        fetchMovies(currentSelection)
+        fetchMovies()
     }
 
     private fun initLayoutManager() {
@@ -63,14 +65,16 @@ class MoviesListFragment: BaseMovieFragment(), MoviesAdapter.MovieInterface {
         moviesRecyclerView.layoutManager = mLayoutManager
     }
 
-    fun populateAdapter(isLocalImage: Boolean = false) {
+    private fun populateAdapter(isLocalImage: Boolean = false) {
         //Populate & set adapter
-        adapter = MoviesAdapter(movies, context)
-        toggleEmptyView(movies.isEmpty())
+        adapter = MoviesAdapter(dataset, context)
+        toggleEmptyView(dataset.isEmpty())
         adapter.let {
             it.movieInterface = this
             it.setLocalImage(isLocalImage)
             moviesRecyclerView.adapter = it
+
+            executeDeleteRequest()
         }
     }
 
@@ -89,64 +93,51 @@ class MoviesListFragment: BaseMovieFragment(), MoviesAdapter.MovieInterface {
         when(requestCode) {
             Constants.DELETE_REQUEST_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    val movie = data?.getParcelableExtra<Movie>(Constants.MOVIE_TO_DELETE)
-                    movie?.let {
-                       val index = movies.indexOf(movie)
-                       movies.remove(movie)
+                    movieToDelete = data?.getParcelableExtra<Movie>(Constants.MOVIE_TO_DELETE)
+                    /*movie?.let {
+                       val index = dataset.indexOf(movie)
+                       dataset.remove(movie)
                        adapter.notifyItemRemoved(index)
-                       toggleEmptyView(movies.isEmpty())
-                    }
+                       toggleEmptyView(dataset.isEmpty())
+                    }*/
                 }
             }
         }
+    }
+
+    private fun executeDeleteRequest() {
+        movieToDelete?.let {
+            val index = dataset.indexOf(it)
+            dataset.remove(it)
+            adapter.notifyItemRemoved(index)
+            toggleEmptyView(dataset.isEmpty())
+        }
+
+        movieToDelete = null
     }
     
     fun getCategoryForId(key: Int) = Category.values().first { it.id == key }.name
 
     fun getIdOfCategory(category: String) = Category.valueOf(category).id
 
-    fun fetchMovies(category: String) {
-        currentSelection = category
-
-        when(category) {
-            Category.favorite.name -> {
-                movies = mDatabaseManager.getAllRecords()
-                populateAdapter(isLocalImage = true)
-            }
-
-            else -> {
-                val service = mRetrofit.create(MoviesEndPointsInterface::class.java)
-                val call = service?.getMovies(category, Constants.API_KEY)
-
-                call?.enqueue(object : Callback<MovieResponse> {
-                    override fun onResponse(call: Call<MovieResponse>, response: Response<MovieResponse>) {
-                        if (response.isSuccessful) {
-                            //Get response -> Populate the adapter
-                            response.body()?.let {
-                                movies = it.results
-                                populateAdapter()
-                            }
-
-                        } else {
-                            Toast.makeText(activity, R.string.unsuccessful_response, Toast.LENGTH_SHORT).show()
-                        }
-                    }
-
-                    override fun onFailure(call: Call<MovieResponse>, t: Throwable) {
-                        Toast.makeText(activity, R.string.error_call, Toast.LENGTH_SHORT).show()
-                    }
-                })
-            }
+    private fun toggleEmptyView(show: Boolean) {
+        empty_rv_container?.visibility = if (show) {
+            moviesRecyclerView?.visibility = View.GONE
+            View.VISIBLE
+        } else {
+            moviesRecyclerView?.visibility = View.VISIBLE
+            View.GONE
         }
     }
 
-    private fun toggleEmptyView(show: Boolean) {
-        empty_rv_container.visibility = if (show) {
-            moviesRecyclerView.visibility = View.GONE
-            View.VISIBLE
-        } else {
-            moviesRecyclerView.visibility = View.VISIBLE
-            View.GONE
+    fun fetchMovies() {
+        mMovieManager.getMovies(currentSelection, {
+            movies ->
+            dataset = movies
+            populateAdapter()
+        }) {
+            dataset = mDatabaseManager.getAllRecords()
+            populateAdapter(isLocalImage = true)
         }
     }
 }

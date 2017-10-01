@@ -11,14 +11,10 @@ import android.view.MenuItem;
 import android.view.View;
 import com.snazhmudinov.movies.R;
 import com.snazhmudinov.movies.fragments.MoviesListFragment;
-import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import retrofit2.Retrofit;
 
 public class  MovieListActivity extends AppCompatActivity {
-    @Inject
-    Retrofit mRetrofit;
 
     @BindView(R.id.drawer_layout)
     DrawerLayout mParentView;
@@ -62,8 +58,8 @@ public class  MovieListActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 final String category = mMoviesListFragment.getCategoryForId(item.getItemId());
-
-                mMoviesListFragment.fetchMovies(category);
+                mMoviesListFragment.setCurrentSelection(category);
+                mMoviesListFragment.fetchMovies();
                 item.setChecked(true);
                 mParentView.closeDrawers();
                 return true;

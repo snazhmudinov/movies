@@ -6,53 +6,60 @@ import android.graphics.PointF
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.Snackbar
+import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import com.snazhmudinov.movies.R
-import com.snazhmudinov.movies.activities.MovieActivity
 import com.snazhmudinov.movies.adapters.CastAdapter
+import com.snazhmudinov.movies.application.MovieApplication
 import com.snazhmudinov.movies.constans.Constants
-import com.snazhmudinov.movies.endpoints.MoviesEndPointsInterface
+import com.snazhmudinov.movies.database.DatabaseManager
 import com.snazhmudinov.movies.manager.DownloadInterface
+import com.snazhmudinov.movies.manager.MovieManager
 import com.snazhmudinov.movies.manager.deleteImageFromMediaStore
 import com.snazhmudinov.movies.manager.downloadImageAndGetPath
 import com.snazhmudinov.movies.models.Cast
-import com.snazhmudinov.movies.models.CastList
 import com.snazhmudinov.movies.models.Movie
-import com.snazhmudinov.movies.models.Trailer
 import kotlinx.android.synthetic.main.movie_content.*
 import kotlinx.android.synthetic.main.movie_fragment.*
 import org.jetbrains.anko.runOnUiThread
-import retrofit2.Call
-import retrofit2.Response
+import javax.inject.Inject
 
 /**
  * Created by snazhmudinov on 7/23/17.
  */
-class MovieFragment: BaseMovieFragment(), View.OnClickListener, DownloadInterface {
+class MovieFragment: Fragment(), View.OnClickListener, DownloadInterface {
+
+    @Inject lateinit var mMovieManager: MovieManager
+    @Inject lateinit var mDatabaseManager: DatabaseManager
 
     var movie: Movie? = null
     private var isLocalPoster = false
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        (activity.application as MovieApplication).appComponents.inject(this)
+    }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?) =
             inflater?.inflate(R.layout.movie_fragment, container, false)
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         movie = activity.intent.getParcelableExtra(Constants.MOVIE_KEY)
         isLocalPoster = activity.intent.getBooleanExtra(Constants.LOCAL_POSTER, false)
 
         movie?.let {
             toolbar_layout.title = it.originalTitle
-            val posterPath = if (isLocalPoster) Uri.parse(it.posterPath) else it.webPosterPath
+
+            val posterPath = if (isLocalPoster) Uri.parse(it.savedFilePath) else it.webPosterPath
             poster_container.setImageURI(posterPath)
+
             setFocusCropRect()
-            getCast(it)
+            mMovieManager.getCast(it) { list -> setupMovieCast(list) }
             configureToolbar()
             configureFab(mDatabaseManager.isMovieInDatabase(it))
         }
@@ -63,7 +70,7 @@ class MovieFragment: BaseMovieFragment(), View.OnClickListener, DownloadInterfac
 
     }
 
-    fun setupMovieCast(castList : List<Cast>) {
+    private fun setupMovieCast(castList : List<Cast>) {
         cast_recycler_view.layoutManager = LinearLayoutManager(context)
         val castAdapter = CastAdapter(castList, context)
         cast_recycler_view.adapter = castAdapter
@@ -92,73 +99,23 @@ class MovieFragment: BaseMovieFragment(), View.OnClickListener, DownloadInterfac
         fab.setImageResource(resId)
     }
 
-    private fun getCast(movie : Movie) {
-        val service = mRetrofit.create(MoviesEndPointsInterface::class.java)
-        val call = service.getCastList(movie.id.toString(), Constants.API_KEY)
-
-        call.enqueue(object : retrofit2.Callback<CastList> {
-            override fun onResponse(call: Call<CastList>?, response: Response<CastList>) {
-                if (response.isSuccessful) {
-                    val actors = response.body()?.castList
-                    if (actors?.isNotEmpty() as Boolean) {
-                        actors.let { setupMovieCast(it.subList(0, 5)) }
-                    }
-
-                } else {
-                    errorToast(R.string.unsuccessful_response)
-                }
-            }
-
-            override fun onFailure(call: Call<CastList>?, t: Throwable?) {
-                errorToast(R.string.error_call)
-            }
-        })
-    }
-
-    private fun playTrailer(movie : Movie) {
-        val service = mRetrofit.create(MoviesEndPointsInterface::class.java)
-        val call = service.getYouTubeTrailer(movie.id.toString(), Constants.API_KEY)
-
-        call.enqueue(object : retrofit2.Callback<Trailer> {
-            override fun onResponse(call: Call<Trailer>, response: Response<Trailer>) {
-                if (response.isSuccessful) {
-                    val responseResults = response.body()?.results
-
-                    if (responseResults?.isNotEmpty() as Boolean) {
-                        responseResults.let {
-                            val url = it[0].trailerURL
-                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-                        }
-                    } else {
-                        errorToast(R.string.no_trailer_error)
-                    }
-
-                } else {
-                    errorToast(R.string.unsuccessful_response)
-                }
-            }
-
-            override fun onFailure(call: Call<Trailer>, t: Throwable) {
-                errorToast(R.string.error_call)
-            }
-        })
-    }
-
     override fun onClick(v: View?) {
         when(v?.id) {
             R.id.fab -> {
                 movie?.let {
                     if (mDatabaseManager.isMovieInDatabase(it)) {
-                        if (!isLocalPoster) { mDatabaseManager.adjustToLocalPoster(it) }
-                        if (deleteImageFromMediaStore(context, it.posterPath)) {
-                            mDatabaseManager.deleteMovieFromDb(it)
-                            configureFab(mDatabaseManager.isMovieInDatabase(it))
-                            //If we delete the movie and should land in fav categories
-                            if (isLocalPoster) {
-                                val intent = Intent()
-                                intent.putExtra(Constants.MOVIE_TO_DELETE, it)
-                                (context as MovieActivity).setResult(Activity.RESULT_OK, intent)
-                                (context as MovieActivity).finish()
+                        val localImgPath = it.savedFilePath ?: ""
+                        if (localImgPath.isNotEmpty()) {
+                            if (deleteImageFromMediaStore(context, localImgPath)) {
+                                mDatabaseManager.deleteMovieFromDb(it)
+                                configureFab(mDatabaseManager.isMovieInDatabase(it))
+
+                                if (isLocalPoster) {
+                                    val intent = Intent()
+                                    intent.putExtra(Constants.MOVIE_TO_DELETE, it)
+                                    activity.setResult(Activity.RESULT_OK, intent)
+                                    activity.finish()
+                                }
                             }
                         }
                     } else {
@@ -169,7 +126,8 @@ class MovieFragment: BaseMovieFragment(), View.OnClickListener, DownloadInterfac
 
             R.id.trailer_icon -> {
                 movie?.let {
-                    playTrailer(it)
+                    mMovieManager.getTrailer(it) {trailer ->
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(trailer)))}
                 }
             }
 
@@ -193,8 +151,6 @@ class MovieFragment: BaseMovieFragment(), View.OnClickListener, DownloadInterfac
             }
         }
     }
-
-    fun errorToast(message : Int)  { Toast.makeText(context, message, Toast.LENGTH_SHORT).show() }
 
     private fun setFocusCropRect() {
         val point = PointF(0.5f, 0f)

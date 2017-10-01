@@ -7,7 +7,7 @@ import com.snazhmudinov.movies.models.Movie
 import org.jetbrains.anko.db.delete
 import org.jetbrains.anko.db.insert
 import org.jetbrains.anko.db.select
-import java.util.ArrayList
+import java.util.*
 
 /**
  * Created by snazhmudinov on 7/16/17.
@@ -19,6 +19,7 @@ class DatabaseManager(val context: Context) {
             insert(MoviesDatabaseHelper.TABLE_NAME,
                     MoviesDatabaseHelper.COLUMN_MOVIE_ID to movie.id,
                     MoviesDatabaseHelper.COLUMN_MOVIE_NAME to movie.originalTitle,
+                    MoviesDatabaseHelper.COLUMN_SAVED_PATH to movie.savedFilePath,
                     MoviesDatabaseHelper.COLUMN_TRAILER_LINK to movie.trailer,
                     MoviesDatabaseHelper.COLUMN_POSTER_LINK to movie.posterPath,
                     MoviesDatabaseHelper.COLUMN_OVERVIEW to movie.overview,
@@ -48,19 +49,6 @@ class DatabaseManager(val context: Context) {
         }
     }
 
-    fun adjustToLocalPoster(movie: Movie) {
-        context.database.use {
-            select(MoviesDatabaseHelper.TABLE_NAME)
-                    .whereArgs("${movie.id} == ${MoviesDatabaseHelper.COLUMN_MOVIE_ID}")
-                    .exec {
-                        if (moveToFirst()) {
-                            val posterPath = getString(getColumnIndex(MoviesDatabaseHelper.COLUMN_POSTER_LINK))
-                            movie.posterPath = posterPath
-                        }
-                    }
-        }
-    }
-
     fun getAllRecords(): MutableList<Movie> {
         val movies: MutableList<Movie> = ArrayList()
 
@@ -70,6 +58,7 @@ class DatabaseManager(val context: Context) {
                 while (moveToNext()) {
                     val movieId = getInt(getColumnIndex(MoviesDatabaseHelper.COLUMN_MOVIE_ID))
                     val movieName = getString(getColumnIndex(MoviesDatabaseHelper.COLUMN_MOVIE_NAME))
+                    val savedPath = getString(getColumnIndex(MoviesDatabaseHelper.COLUMN_SAVED_PATH))
                     val trailerLink = getString(getColumnIndex(MoviesDatabaseHelper.COLUMN_TRAILER_LINK))
                     val posterPath = getString(getColumnIndex(MoviesDatabaseHelper.COLUMN_POSTER_LINK))
                     val overview = getString(getColumnIndex(MoviesDatabaseHelper.COLUMN_OVERVIEW))
@@ -80,6 +69,7 @@ class DatabaseManager(val context: Context) {
                     val movie = Movie(posterPath, overview, releaseDate, movieId, movieName,
                             movieName, popularity, voteCount)
                     movie.trailer = trailerLink
+                    movie.savedFilePath = savedPath
 
                     movies.add(movie)
                 }

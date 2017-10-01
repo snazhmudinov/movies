@@ -21,6 +21,8 @@ data class Movie(@SerializedName("poster_path") var posterPath: String,
     val webPosterPath: Uri?
         get() = Uri.parse(Constants.POSTER_BASE_URL + posterPath)
 
+    var savedFilePath: String? = null
+
     var trailer: String? = null
 
     constructor(parcel: Parcel) : this(
@@ -32,6 +34,7 @@ data class Movie(@SerializedName("poster_path") var posterPath: String,
             parcel.readString(),
             parcel.readDouble(),
             parcel.readInt()) {
+        savedFilePath = parcel.readString()
         trailer = parcel.readString()
     }
 
@@ -44,20 +47,15 @@ data class Movie(@SerializedName("poster_path") var posterPath: String,
         parcel.writeString(title)
         parcel.writeDouble(popularity)
         parcel.writeInt(voteCount)
+        parcel.writeString(savedFilePath)
         parcel.writeString(trailer)
     }
 
-    override fun describeContents(): Int {
-        return 0
-    }
+    override fun describeContents() = 0
 
     companion object CREATOR : Parcelable.Creator<Movie> {
-        override fun createFromParcel(parcel: Parcel): Movie {
-            return Movie(parcel)
-        }
+        override fun createFromParcel(parcel: Parcel) = Movie(parcel)
 
-        override fun newArray(size: Int): Array<Movie?> {
-            return arrayOfNulls(size)
-        }
+        override fun newArray(size: Int): Array<Movie?> = arrayOfNulls(size)
     }
 }

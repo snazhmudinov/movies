@@ -6,7 +6,7 @@ import com.facebook.drawee.backends.pipeline.Fresco
 import com.snazhmudinov.movies.components.AppComponents
 import com.snazhmudinov.movies.components.DaggerAppComponents
 import com.snazhmudinov.movies.modules.DatabaseModule
-import com.snazhmudinov.movies.modules.NetworkModule
+import com.snazhmudinov.movies.modules.MovieModule
 import io.fabric.sdk.android.Fabric
 
 
@@ -19,8 +19,8 @@ class MovieApplication: Application() {
     val appComponents: AppComponents by lazy {
         DaggerAppComponents
                 .builder()
-                .networkModule(NetworkModule())
                 .databaseModule(DatabaseModule(applicationContext))
+                .movieModule(MovieModule(applicationContext))
                 .build()
     }
 

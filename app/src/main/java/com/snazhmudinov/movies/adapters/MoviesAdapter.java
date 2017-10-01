@@ -46,7 +46,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolde
     @Override
     public void onBindViewHolder(MovieHolder holder, int position) {
         Movie currentMovie = moviesList.get(position);
-        Uri uri = isLocalImage ? Uri.parse(currentMovie.getPosterPath()) :
+        Uri uri = isLocalImage ? Uri.parse(currentMovie.getSavedFilePath()) :
                 Uri.parse(Constants.POSTER_BASE_URL + currentMovie.getPosterPath());
 
         holder.mPosterView.setImageURI(uri);

@@ -62,6 +62,8 @@ class MovieFragment: Fragment(), View.OnClickListener, DownloadInterface {
             mMovieManager.getCast(it) { list -> setupMovieCast(list) }
             configureToolbar()
             configureFab(mDatabaseManager.isMovieInDatabase(it))
+
+            mMovieManager.getTrailer(it) { trailer -> it.trailer = trailer }
         }
 
         fab?.setOnClickListener(this)
@@ -125,10 +127,7 @@ class MovieFragment: Fragment(), View.OnClickListener, DownloadInterface {
             }
 
             R.id.trailer_icon -> {
-                movie?.let {
-                    mMovieManager.getTrailer(it) {trailer ->
-                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(trailer)))}
-                }
+                movie?.let { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it.trailer))) }
             }
 
             R.id.actors_drop_down -> {

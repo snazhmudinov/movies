@@ -22,7 +22,6 @@ data class Movie(@SerializedName("poster_path") var posterPath: String,
         get() = Uri.parse(Constants.POSTER_BASE_URL + posterPath)
 
     var savedFilePath: String? = null
-
     var trailer: String? = null
 
     constructor(parcel: Parcel) : this(

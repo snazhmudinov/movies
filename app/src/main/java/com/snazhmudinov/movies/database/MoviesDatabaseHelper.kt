@@ -7,7 +7,7 @@ import org.jetbrains.anko.db.*
 /**
  * Created by snazhmudinov on 7/16/17.
  */
-class MoviesDatabaseHelper(context: Context): ManagedSQLiteOpenHelper(context, "MoviesDB", null, 1) {
+class MoviesDatabaseHelper(context: Context): ManagedSQLiteOpenHelper(context, "MoviesDB_1", null, 1) {
 
     companion object {
 

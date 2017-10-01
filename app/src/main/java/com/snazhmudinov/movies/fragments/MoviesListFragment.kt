@@ -4,20 +4,20 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.Toast
 import com.evernote.android.state.State
 import com.evernote.android.state.StateSaver
 import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.activities.MovieActivity
-import com.snazhmudinov.movies.activities.MovieListActivity
 import com.snazhmudinov.movies.adapters.MoviesAdapter
 import com.snazhmudinov.movies.constans.Constants
 import com.snazhmudinov.movies.endpoints.MoviesEndPointsInterface
 import com.snazhmudinov.movies.enum.Category
+import com.snazhmudinov.movies.interfaces.MovieInterface
 import com.snazhmudinov.movies.models.Movie
 import com.snazhmudinov.movies.models.MovieResponse
 import kotlinx.android.synthetic.main.fragment_movies_list.*
@@ -28,12 +28,15 @@ import retrofit2.Response
 /**
  * Created by snazhmudinov on 7/9/17.
  */
-class MoviesListFragment: BaseMovieFragment(), MoviesAdapter.MovieInterface {
+class MoviesListFragment: BaseMovieFragment(), MovieInterface {
 
     @State var currentSelection: String = ""
     @State var isLandOrientation = false
+    @State var isGridMode = true
+
     private lateinit var adapter: MoviesAdapter
     private lateinit var movies: MutableList<Movie>
+    lateinit var movieListener: MovieInterface
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,38 +53,49 @@ class MoviesListFragment: BaseMovieFragment(), MoviesAdapter.MovieInterface {
             inflater?.inflate(R.layout.fragment_movies_list, container, false)
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
-        initLayoutManager()
-
         //if nothing to restore, default the selection
         if (currentSelection.isEmpty()) {
             currentSelection = Category.popular.name
         }
-
         fetchMovies(currentSelection)
     }
 
     private fun initLayoutManager() {
         //Layout manager region
-        val mLayoutManager = GridLayoutManager(context, 2)
+        val mLayoutManager = if (isGridMode) { GridLayoutManager(context, 2) } else {
+            LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false) }
         moviesRecyclerView.layoutManager = mLayoutManager
     }
 
-    fun populateAdapter(isLocalImage: Boolean = false) {
+    private fun populateAdapter(isLocalImage: Boolean = false) {
+        initLayoutManager()
         //Populate & set adapter
         adapter = MoviesAdapter(movies, context)
+        adapter.setMode(if (isGridMode) MoviesAdapter.GRID_MODE else MoviesAdapter.LIST_MODE)
         toggleEmptyView(movies.isEmpty())
         adapter.let {
             it.movieInterface = this
             it.setLocalImage(isLocalImage)
             moviesRecyclerView.adapter = it
+
+            if (isLandOrientation) {
+                getFirstMovie()?.let {
+                    movieListener.onMovieSelected(it, isLocalImage)
+                }
+            }
         }
+    }
+
+    private fun getFirstMovie(): Movie? {
+        var movie: Movie? = null
+        if (movies.isNotEmpty()) { movie = movies[0] }
+        return movie
     }
 
     override fun onMovieSelected(movie: Movie?, isLocalImage: Boolean) {
         movie?.let {
             if (isLandOrientation) {
-                val fragment = MovieFragment.newInstance(it, isLocalImage)
-                (activity as MovieListActivity).displayMovie(fragment)
+                movieListener.onMovieSelected(it, isLocalImage)
             } else {
                 val intent = Intent(context, MovieActivity::class.java)
                 intent.putExtra(Constants.MOVIE_KEY, it)

@@ -9,20 +9,18 @@ import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
-
 import com.snazhmudinov.movies.R;
 import com.snazhmudinov.movies.application.MovieApplication;
 import com.snazhmudinov.movies.fragments.MovieFragment;
 import com.snazhmudinov.movies.fragments.MoviesListFragment;
+import com.snazhmudinov.movies.interfaces.MovieInterface;
 import com.snazhmudinov.movies.models.Movie;
-
 import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Retrofit;
 
-public class  MovieListActivity extends AppCompatActivity {
+public class  MovieListActivity extends AppCompatActivity implements MovieInterface {
     @Inject
     Retrofit mRetrofit;
 
@@ -46,9 +44,21 @@ public class  MovieListActivity extends AppCompatActivity {
 
         mMoviesListFragment = (MoviesListFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.movies_list_fragment);
-        mMoviesListFragment.setLandOrientation(findViewById(R.id.movie_fragment) != null);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        mMoviesListFragment.setLandOrientation(isTablet());
+        mMoviesListFragment.setGridMode(!isTablet());
+        if (isTablet()) { mMoviesListFragment.setMovieListener(this); }
 
         setupDrawerContent();
+    }
+
+    private boolean isTablet() {
+        return findViewById(R.id.movie_fragment) != null;
     }
 
     public void setupDrawerContent() {
@@ -70,7 +80,6 @@ public class  MovieListActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 final String category = mMoviesListFragment.getCategoryForId(item.getItemId());
-
                 mMoviesListFragment.fetchMovies(category);
                 item.setChecked(true);
                 mParentView.closeDrawers();
@@ -79,9 +88,12 @@ public class  MovieListActivity extends AppCompatActivity {
         });
     }
 
-    public void displayMovie(@NonNull MovieFragment movie) {
+    @Override
+    public void onMovieSelected(Movie movie, boolean isLocalImage) {
+        final MovieFragment fragment = MovieFragment.Companion.newInstance(movie, isLocalImage);
+
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.movie_fragment, movie)
+                .replace(R.id.movie_fragment, fragment)
                 .commit();
     }
 }

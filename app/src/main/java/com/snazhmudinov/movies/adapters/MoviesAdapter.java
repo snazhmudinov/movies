@@ -6,14 +6,15 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.snazhmudinov.movies.R;
 import com.snazhmudinov.movies.constans.Constants;
+import com.snazhmudinov.movies.interfaces.MovieInterface;
 import com.snazhmudinov.movies.models.Movie;
 import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 /**
  * Created by snazhmudinov on 5/28/17.
@@ -21,14 +22,14 @@ import butterknife.OnClick;
 
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolder> {
 
-    public interface MovieInterface {
-        void onMovieSelected(Movie movie, boolean isLocalImage);
-    }
-
     private List<Movie> moviesList;
     private Context mContext;
     private boolean isLocalImage = false;
     public MovieInterface movieInterface;
+
+    public static final int GRID_MODE = 0;
+    public static final int LIST_MODE = 1;
+    private int mMode = 0;
 
     public MoviesAdapter(List<Movie> movies, Context context) {
         moviesList = movies;
@@ -38,7 +39,17 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolde
     @Override
     public MovieHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        View view = inflater.inflate(R.layout.movie_rv_item, parent, false);
+        View view = null;
+        switch(viewType) {
+            case GRID_MODE:
+                view = inflater.inflate(R.layout.movie_grid_item, parent, false);
+                break;
+
+            case LIST_MODE:
+                view = inflater.inflate(R.layout.movie_list_item, parent, false);
+                break;
+        }
+
 
         return new MovieHolder(view);
     }
@@ -50,6 +61,16 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolde
                 Uri.parse(Constants.POSTER_BASE_URL + currentMovie.getPosterPath());
 
         holder.mPosterView.setImageURI(uri);
+
+        if (mMode == LIST_MODE) {
+            final TextView tv = (TextView) holder.itemView.findViewById(R.id.movie_title);
+            tv.setText(moviesList.get(position).getTitle());
+        }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return mMode;
     }
 
     @Override
@@ -66,18 +87,23 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolde
             super(itemView);
 
             ButterKnife.bind(this, itemView);
-        }
-
-        @OnClick(R.id.poster)
-        void openMovieDetails() {
-            Movie movie = moviesList.get(getAdapterPosition());
-            if (movieInterface != null) {
-                movieInterface.onMovieSelected(movie, isLocalImage);
-            }
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Movie movie = moviesList.get(getAdapterPosition());
+                    if (movieInterface != null) {
+                        movieInterface.onMovieSelected(movie, isLocalImage);
+                    }
+                }
+            });
         }
     }
 
     public void setLocalImage(boolean value) {
         isLocalImage = value;
+    }
+
+    public void setMode(int mode) {
+        mMode = mode;
     }
 }

@@ -33,7 +33,6 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
     @State var currentSelection: String = ""
     private lateinit var dataset: MutableList<Movie>
     private lateinit var adapter: MoviesAdapter
-    private var movieToDelete: Movie? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,8 +72,6 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
             it.movieInterface = this
             it.setLocalImage(isLocalImage)
             moviesRecyclerView.adapter = it
-
-            executeDeleteRequest()
         }
     }
 
@@ -93,27 +90,16 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
         when(requestCode) {
             Constants.DELETE_REQUEST_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
-                    movieToDelete = data?.getParcelableExtra<Movie>(Constants.MOVIE_TO_DELETE)
-                    /*movie?.let {
-                       val index = dataset.indexOf(movie)
-                       dataset.remove(movie)
-                       adapter.notifyItemRemoved(index)
-                       toggleEmptyView(dataset.isEmpty())
-                    }*/
+                    val movieToDelete = data?.getParcelableExtra<Movie>(Constants.MOVIE_TO_DELETE)
+                    movieToDelete?.let {
+                        val index = dataset.indexOf(it)
+                        dataset.remove(it)
+                        adapter.notifyItemRemoved(index)
+                        toggleEmptyView(dataset.isEmpty())
+                    }
                 }
             }
         }
-    }
-
-    private fun executeDeleteRequest() {
-        movieToDelete?.let {
-            val index = dataset.indexOf(it)
-            dataset.remove(it)
-            adapter.notifyItemRemoved(index)
-            toggleEmptyView(dataset.isEmpty())
-        }
-
-        movieToDelete = null
     }
     
     fun getCategoryForId(key: Int) = Category.values().first { it.id == key }.name

@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:padding="5dp"
+    android:background="@drawable/list_item_selector">
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/poster"

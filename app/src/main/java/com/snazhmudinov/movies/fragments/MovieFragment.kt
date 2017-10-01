@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.PointF
 import android.net.Uri
 import android.os.Bundle
+import android.support.annotation.UiThread
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -200,10 +201,12 @@ class MovieFragment: BaseMovieFragment(), View.OnClickListener, DownloadInterfac
     }
 
     override fun downloadFinished() {
-        movie?.let {
-            mDatabaseManager.insertMovieIntoDB(it)
-            configureFab(mDatabaseManager.isMovieInDatabase(it))
-            displaySnackbar()
+        activity.runOnUiThread {
+            movie?.let {
+                mDatabaseManager.insertMovieIntoDB(it)
+                configureFab(mDatabaseManager.isMovieInDatabase(it))
+                displaySnackbar()
+            }
         }
     }
 

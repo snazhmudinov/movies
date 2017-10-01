@@ -30,6 +30,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolde
     public static final int GRID_MODE = 0;
     public static final int LIST_MODE = 1;
     private int mMode = 0;
+    private int mCurrentSelection = 0;
 
     public MoviesAdapter(List<Movie> movies, Context context) {
         moviesList = movies;
@@ -65,6 +66,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolde
         if (mMode == LIST_MODE) {
             final TextView tv = (TextView) holder.itemView.findViewById(R.id.movie_title);
             tv.setText(moviesList.get(position).getTitle());
+            holder.itemView.setSelected(position == mCurrentSelection);
         }
     }
 
@@ -83,7 +85,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolde
         @BindView(R.id.poster)
         SimpleDraweeView mPosterView;
 
-        MovieHolder(View itemView) {
+        MovieHolder(final View itemView) {
             super(itemView);
 
             ButterKnife.bind(this, itemView);
@@ -92,7 +94,9 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolde
                 public void onClick(View v) {
                     Movie movie = moviesList.get(getAdapterPosition());
                     if (movieInterface != null) {
+                        mCurrentSelection = moviesList.indexOf(movie);
                         movieInterface.onMovieSelected(movie, isLocalImage);
+                        notifyDataSetChanged();
                     }
                 }
             });
@@ -105,5 +109,9 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieHolde
 
     public void setMode(int mode) {
         mMode = mode;
+    }
+
+    public void setSelectionIndex(int index) {
+        mCurrentSelection = index;
     }
 }

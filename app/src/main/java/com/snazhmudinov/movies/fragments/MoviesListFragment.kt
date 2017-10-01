@@ -13,6 +13,7 @@ import com.evernote.android.state.State
 import com.evernote.android.state.StateSaver
 import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.activities.MovieActivity
+import com.snazhmudinov.movies.activities.MovieListActivity
 import com.snazhmudinov.movies.adapters.MoviesAdapter
 import com.snazhmudinov.movies.constans.Constants
 import com.snazhmudinov.movies.endpoints.MoviesEndPointsInterface
@@ -31,6 +32,7 @@ import retrofit2.Response
 class MoviesListFragment: BaseMovieFragment(), MovieInterface {
 
     @State var currentSelection: String = ""
+    @State var currentMovieIndex = 0
     @State var isLandOrientation = false
     @State var isGridMode = true
 
@@ -72,27 +74,24 @@ class MoviesListFragment: BaseMovieFragment(), MovieInterface {
         //Populate & set adapter
         adapter = MoviesAdapter(movies, context)
         adapter.setMode(if (isGridMode) MoviesAdapter.GRID_MODE else MoviesAdapter.LIST_MODE)
-        toggleEmptyView(movies.isEmpty())
+        adapter.setSelectionIndex(currentMovieIndex)
         adapter.let {
             it.movieInterface = this
             it.setLocalImage(isLocalImage)
             moviesRecyclerView.adapter = it
 
             if (isLandOrientation) {
-                getFirstMovie()?.let {
-                    movieListener.onMovieSelected(it, isLocalImage)
+                if (movies.isNotEmpty()) {
+                    val movie = movies[currentMovieIndex]
+                    movie.let { movieListener.onMovieSelected(it, isLocalImage) }
                 }
             }
         }
-    }
-
-    private fun getFirstMovie(): Movie? {
-        var movie: Movie? = null
-        if (movies.isNotEmpty()) { movie = movies[0] }
-        return movie
+        toggleEmptyView(movies.isEmpty())
     }
 
     override fun onMovieSelected(movie: Movie?, isLocalImage: Boolean) {
+        currentMovieIndex = movies.indexOf(movie ?: 0)
         movie?.let {
             if (isLandOrientation) {
                 movieListener.onMovieSelected(it, isLocalImage)
@@ -129,7 +128,6 @@ class MoviesListFragment: BaseMovieFragment(), MovieInterface {
 
     fun fetchMovies(category: String) {
         currentSelection = category
-
         when(category) {
             Category.favorite.name -> {
                 movies = mDatabaseManager.getAllRecords()
@@ -170,5 +168,6 @@ class MoviesListFragment: BaseMovieFragment(), MovieInterface {
             moviesRecyclerView.visibility = View.VISIBLE
             View.GONE
         }
+        (activity as MovieListActivity).adjustUI(show)
     }
 }

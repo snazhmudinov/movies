@@ -9,6 +9,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
+
 import com.snazhmudinov.movies.R;
 import com.snazhmudinov.movies.application.MovieApplication;
 import com.snazhmudinov.movies.fragments.MovieFragment;
@@ -80,6 +82,7 @@ public class  MovieListActivity extends AppCompatActivity implements MovieInterf
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 final String category = mMoviesListFragment.getCategoryForId(item.getItemId());
+                mMoviesListFragment.setCurrentMovieIndex(0);
                 mMoviesListFragment.fetchMovies(category);
                 item.setChecked(true);
                 mParentView.closeDrawers();
@@ -95,5 +98,11 @@ public class  MovieListActivity extends AppCompatActivity implements MovieInterf
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.movie_fragment, fragment)
                 .commit();
+    }
+
+    public void adjustUI(boolean showEmpty) {
+        if (isTablet()) {
+            findViewById(R.id.movie_fragment).setVisibility(showEmpty ? View.GONE : View.VISIBLE);
+        }
     }
 }

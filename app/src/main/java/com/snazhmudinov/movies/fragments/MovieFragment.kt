@@ -26,6 +26,7 @@ import com.snazhmudinov.movies.models.Movie
 import com.snazhmudinov.movies.models.Trailer
 import kotlinx.android.synthetic.main.movie_content.*
 import kotlinx.android.synthetic.main.movie_fragment.*
+import org.jetbrains.anko.runOnUiThread
 import retrofit2.Call
 import retrofit2.Response
 
@@ -184,10 +185,12 @@ class MovieFragment: BaseMovieFragment(), View.OnClickListener, DownloadInterfac
     }
 
     override fun downloadFinished() {
-        movie?.let {
-            mDatabaseManager.insertMovieIntoDB(it)
-            configureFab(mDatabaseManager.isMovieInDatabase(it))
-            displaySnackbar()
+        context.runOnUiThread {
+            movie?.let {
+                mDatabaseManager.insertMovieIntoDB(it)
+                configureFab(mDatabaseManager.isMovieInDatabase(it))
+                displaySnackbar()
+            }
         }
     }
 

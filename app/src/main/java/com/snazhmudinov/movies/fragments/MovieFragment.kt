@@ -17,7 +17,6 @@ import com.snazhmudinov.movies.adapters.CastAdapter
 import com.snazhmudinov.movies.application.MovieApplication
 import com.snazhmudinov.movies.constans.Constants
 import com.snazhmudinov.movies.database.DatabaseManager
-import com.snazhmudinov.movies.manager.DownloadInterface
 import com.snazhmudinov.movies.manager.MovieManager
 import com.snazhmudinov.movies.manager.deleteImageFromMediaStore
 import com.snazhmudinov.movies.manager.downloadImageAndGetPath
@@ -31,7 +30,7 @@ import javax.inject.Inject
 /**
  * Created by snazhmudinov on 7/23/17.
  */
-class MovieFragment: Fragment(), View.OnClickListener, DownloadInterface {
+class MovieFragment: Fragment(), View.OnClickListener {
 
     @Inject lateinit var mMovieManager: MovieManager
     @Inject lateinit var mDatabaseManager: DatabaseManager
@@ -119,9 +118,20 @@ class MovieFragment: Fragment(), View.OnClickListener, DownloadInterface {
                                     activity.finish()
                                 }
                             }
+                        } else {
+                            mDatabaseManager.deleteMovieFromDb(it)
+                            configureFab(mDatabaseManager.isMovieInDatabase(it))
                         }
                     } else {
-                        downloadImageAndGetPath(context, it, this)
+                        downloadImageAndGetPath(context, it) {
+                            context.runOnUiThread {
+                                movie?.let {
+                                    mDatabaseManager.insertMovieIntoDB(it)
+                                    configureFab(mDatabaseManager.isMovieInDatabase(it))
+                                    displaySnackbar()
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -137,16 +147,6 @@ class MovieFragment: Fragment(), View.OnClickListener, DownloadInterface {
                 val drawable = if (cast_recycler_view.visibility == View.VISIBLE) R.drawable.ic_arrow_drop_up
                 else R.drawable.ic_arrow_drop_down
                 actors_drop_down.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawable, 0)
-            }
-        }
-    }
-
-    override fun downloadFinished() {
-        context.runOnUiThread {
-            movie?.let {
-                mDatabaseManager.insertMovieIntoDB(it)
-                configureFab(mDatabaseManager.isMovieInDatabase(it))
-                displaySnackbar()
             }
         }
     }

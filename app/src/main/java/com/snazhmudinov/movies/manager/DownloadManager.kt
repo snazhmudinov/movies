@@ -14,11 +14,7 @@ import java.io.IOException
  * Created by snazhmudinov on 7/25/17.
  */
 
-interface DownloadInterface {
-    fun downloadFinished()
-}
-
-fun downloadImageAndGetPath(context: Context, movie: Movie, downloadInterface: DownloadInterface) {
+fun downloadImageAndGetPath(context: Context, movie: Movie, downloadFinished: () -> Unit) {
     val client = OkHttpClient()
     val request = Request.Builder()
             .url(movie.webPosterPath.toString())
@@ -26,14 +22,12 @@ fun downloadImageAndGetPath(context: Context, movie: Movie, downloadInterface: D
 
     client.newCall(request).enqueue(object : Callback {
         override fun onResponse(call: Call?, response: Response?) {
-            if (response?.isSuccessful ?: false) {
-                response?.let {
-                    val bytes = it.body()?.bytes()
-                    val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes?.size ?: 0)
-                    val path = MediaStore.Images.Media.insertImage(context.contentResolver, bitmap, "", null)
-                    movie.savedFilePath = path
-                    downloadInterface.downloadFinished()
-                }
+            if (response?.isSuccessful == true) {
+                val bytes = response.body()?.bytes()
+                val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes?.size ?: 0)
+                val path = MediaStore.Images.Media.insertImage(context.contentResolver, bitmap, "", null)
+                movie.savedFilePath = path
+                downloadFinished()
             }
         }
 

@@ -60,7 +60,7 @@ public class  MovieListActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 final String category = mMoviesListFragment.getCategoryForId(item.getItemId());
 
-                if (Connectivity.INSTANCE.isNetworkAvailable(MovieListActivity.this)
+                if (!Connectivity.INSTANCE.isNetworkAvailable(MovieListActivity.this)
                         && !category.equalsIgnoreCase("favorite")) {
                     Connectivity.INSTANCE.showNoNetworkToast(MovieListActivity.this);
                     return false;

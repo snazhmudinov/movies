@@ -37,7 +37,6 @@ class MovieManager(val context: Context) {
         }
     }
 
-
     fun getCast(movie: Movie, setupCast: (MutableList<Cast>) -> Unit) {
         val service = retrofit.create(MoviesEndPointsInterface::class.java)
         val call = service.getCastList(movie.id.toString(), Constants.API_KEY)
@@ -59,7 +58,6 @@ class MovieManager(val context: Context) {
             }
         })
     }
-
 
     fun getTrailer(movie: Movie, playTrailer: (String) -> Unit) {
         val service = retrofit.create(MoviesEndPointsInterface::class.java)

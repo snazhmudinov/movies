@@ -10,6 +10,7 @@ import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import com.snazhmudinov.movies.R;
+import com.snazhmudinov.movies.connectivity.Connectivity;
 import com.snazhmudinov.movies.fragments.MoviesListFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -58,6 +59,13 @@ public class  MovieListActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 final String category = mMoviesListFragment.getCategoryForId(item.getItemId());
+
+                if (Connectivity.INSTANCE.isNetworkAvailable(MovieListActivity.this)
+                        && !category.equalsIgnoreCase("favorite")) {
+                    Connectivity.INSTANCE.showNoNetworkToast(MovieListActivity.this);
+                    return false;
+                }
+
                 mMoviesListFragment.setCurrentSelection(category);
                 mMoviesListFragment.fetchMovies();
                 item.setChecked(true);

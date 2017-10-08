@@ -14,6 +14,7 @@ import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.activities.MovieActivity
 import com.snazhmudinov.movies.adapters.MoviesAdapter
 import com.snazhmudinov.movies.application.MovieApplication
+import com.snazhmudinov.movies.connectivity.Connectivity
 import com.snazhmudinov.movies.constans.Constants
 import com.snazhmudinov.movies.database.DatabaseManager
 import com.snazhmudinov.movies.enum.Category
@@ -76,11 +77,15 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
     }
 
     override fun onMovieSelected(movie: Movie?, isLocalImage: Boolean) {
-        movie?.let {
-            val intent = Intent(context, MovieActivity::class.java)
-            intent.putExtra(Constants.MOVIE_KEY, it)
-            intent.putExtra(Constants.LOCAL_POSTER, isLocalImage)
-            startActivityForResult(intent, Constants.DELETE_REQUEST_CODE)
+        if (Connectivity.isNetworkAvailable(activity)) {
+            movie?.let {
+                val intent = Intent(context, MovieActivity::class.java)
+                intent.putExtra(Constants.MOVIE_KEY, it)
+                intent.putExtra(Constants.LOCAL_POSTER, isLocalImage)
+                startActivityForResult(intent, Constants.DELETE_REQUEST_CODE)
+            }
+        } else {
+            Connectivity.showNoNetworkToast(activity)
         }
     }
 

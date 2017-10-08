@@ -15,6 +15,7 @@ import android.view.ViewGroup
 import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.adapters.CastAdapter
 import com.snazhmudinov.movies.application.MovieApplication
+import com.snazhmudinov.movies.connectivity.Connectivity
 import com.snazhmudinov.movies.constans.Constants
 import com.snazhmudinov.movies.database.DatabaseManager
 import com.snazhmudinov.movies.manager.MovieManager
@@ -123,14 +124,18 @@ class MovieFragment: Fragment(), View.OnClickListener {
                             configureFab(mDatabaseManager.isMovieInDatabase(it))
                         }
                     } else {
-                        downloadImageAndGetPath(context, it) {
-                            context.runOnUiThread {
-                                movie?.let {
-                                    mDatabaseManager.insertMovieIntoDB(it)
-                                    configureFab(mDatabaseManager.isMovieInDatabase(it))
-                                    displaySnackbar()
+                        if (Connectivity.isNetworkAvailable(activity)) {
+                            downloadImageAndGetPath(context, it) {
+                                context.runOnUiThread {
+                                    movie?.let {
+                                        mDatabaseManager.insertMovieIntoDB(it)
+                                        configureFab(mDatabaseManager.isMovieInDatabase(it))
+                                        displaySnackbar()
+                                    }
                                 }
                             }
+                        } else {
+                            Connectivity.showNoNetworkToast(activity)
                         }
                     }
                 }

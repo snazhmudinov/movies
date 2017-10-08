@@ -66,6 +66,7 @@ dependencies {
     compile 'com.evernote:android-state:1.1.5'
     kapt 'com.evernote:android-state-processor:1.1.5'
 }
+
 repositories {
     mavenCentral()
     maven { url 'https://maven.fabric.io/public' }

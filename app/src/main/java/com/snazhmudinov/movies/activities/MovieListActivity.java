@@ -63,6 +63,7 @@ public class  MovieListActivity extends AppCompatActivity {
                 if (!Connectivity.INSTANCE.isNetworkAvailable(MovieListActivity.this)
                         && !category.equalsIgnoreCase("favorite")) {
                     Connectivity.INSTANCE.showNoNetworkToast(MovieListActivity.this);
+                    mParentView.closeDrawers();
                     return false;
                 }
 

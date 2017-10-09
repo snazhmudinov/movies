@@ -12,7 +12,7 @@ object Connectivity {
 
     fun isNetworkAvailable(context: Context): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        return connectivityManager.activeNetworkInfo.isConnected
+        return connectivityManager.activeNetworkInfo?.isConnected ?: false
     }
 
     fun showNoNetworkToast(context: Context) {

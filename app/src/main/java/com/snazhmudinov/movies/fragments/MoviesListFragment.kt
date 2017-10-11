@@ -76,9 +76,9 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
         }
     }
 
-    override fun onMovieSelected(movie: Movie?, isLocalImage: Boolean) {
+    override fun onMovieSelected(movie: Movie, isLocalImage: Boolean) {
         if (Connectivity.isNetworkAvailable(activity)) {
-            movie?.let {
+            movie.let {
                 val intent = Intent(context, MovieActivity::class.java)
                 intent.putExtra(Constants.MOVIE_KEY, it)
                 intent.putExtra(Constants.LOCAL_POSTER, isLocalImage)

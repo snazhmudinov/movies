@@ -31,7 +31,7 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
     @Inject lateinit var mMovieManager: MovieManager
     @Inject lateinit var mDatabaseManager: DatabaseManager
 
-    @State var currentSelection: String = ""
+    @State var currentSelection: String = Category.popular.name
     private lateinit var dataset: MutableList<Movie>
     private lateinit var adapter: MoviesAdapter
 
@@ -52,10 +52,6 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         initLayoutManager()
-        //if nothing to restore, default the selection
-        if (currentSelection.isEmpty()) {
-            currentSelection = Category.popular.name
-        }
         fetchMovies()
     }
 

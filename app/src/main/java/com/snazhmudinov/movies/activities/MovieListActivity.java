@@ -1,5 +1,7 @@
 package com.snazhmudinov.movies.activities;
 
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -11,11 +13,12 @@ import android.view.MenuItem;
 import android.view.View;
 import com.snazhmudinov.movies.R;
 import com.snazhmudinov.movies.connectivity.Connectivity;
+import com.snazhmudinov.movies.connectivity.ConnectivityBroadcastReceiver;
 import com.snazhmudinov.movies.fragments.MoviesListFragment;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class  MovieListActivity extends AppCompatActivity {
+public class  MovieListActivity extends AppCompatActivity implements ConnectivityBroadcastReceiver.NetworkListenerInterface {
 
     @BindView(R.id.drawer_layout)
     DrawerLayout mParentView;
@@ -27,6 +30,7 @@ public class  MovieListActivity extends AppCompatActivity {
     NavigationView mNavView;
 
     private MoviesListFragment mMoviesListFragment;
+    private ConnectivityBroadcastReceiver connectivityBroadcastReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +42,21 @@ public class  MovieListActivity extends AppCompatActivity {
                 .findFragmentById(R.id.movies_list_fragment);
 
         setupDrawerContent();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerNetworkListener();
+    }
+
+    @Override
+    protected void onPause() {
+        if (connectivityBroadcastReceiver != null) {
+            unregisterReceiver(connectivityBroadcastReceiver);
+            connectivityBroadcastReceiver = null;
+        }
+        super.onPause();
     }
 
     public void setupDrawerContent() {
@@ -74,5 +93,19 @@ public class  MovieListActivity extends AppCompatActivity {
                 return true;
             }
         });
+    }
+
+    private void registerNetworkListener() {
+        connectivityBroadcastReceiver = new ConnectivityBroadcastReceiver();
+        connectivityBroadcastReceiver.setNetworkStateListener(this);
+        final IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(connectivityBroadcastReceiver, filter);
+    }
+
+    @Override
+    public void onNetworkStateChanged(boolean isNetworkAvailable) {
+        if (isNetworkAvailable) {
+            mMoviesListFragment.fetchMovies();
+        }
     }
 }

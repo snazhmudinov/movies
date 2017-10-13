@@ -4,6 +4,7 @@ import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.support.design.widget.NavigationView
+import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.Gravity
 import com.snazhmudinov.movies.R
@@ -17,6 +18,10 @@ class MovieListActivity : AppCompatActivity(), ConnectivityBroadcastReceiver.Net
     private var moviesListFragment: MoviesListFragment? = null
     private var connectivityBroadcastReceiver: ConnectivityBroadcastReceiver? = null
     private var wasDisconnectedBefore = false
+    private val noInternetSnackbar by lazy {
+           Snackbar.make(findViewById(android.R.id.content), R.string.no_connection,
+                        Snackbar.LENGTH_LONG)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,7 +85,10 @@ class MovieListActivity : AppCompatActivity(), ConnectivityBroadcastReceiver.Net
     override fun onNetworkStateChanged(isNetworkAvailable: Boolean) {
         if (isNetworkAvailable && wasDisconnectedBefore) {
             moviesListFragment?.fetchMovies()
+            noInternetSnackbar.dismiss()
         }
+
+        if (!isNetworkAvailable) { noInternetSnackbar.show() }
         wasDisconnectedBefore = !isNetworkAvailable
     }
 }

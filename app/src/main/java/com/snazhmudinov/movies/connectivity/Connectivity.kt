@@ -3,6 +3,7 @@ package com.snazhmudinov.movies.connectivity
 import android.content.Context
 import android.net.ConnectivityManager
 import android.widget.Toast
+import com.snazhmudinov.movies.R
 
 /**
  * Created by snazhmudinov on 10/8/17.
@@ -17,7 +18,7 @@ object Connectivity {
 
     fun showNoNetworkToast(context: Context) {
         noNetworkToast?.cancel()
-        noNetworkToast = Toast.makeText(context, "Please make sure you have internet connection", Toast.LENGTH_SHORT)
+        noNetworkToast = Toast.makeText(context, R.string.no_connection, Toast.LENGTH_SHORT)
         noNetworkToast?.show()
     }
 }

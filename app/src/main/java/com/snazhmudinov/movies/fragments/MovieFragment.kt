@@ -1,17 +1,24 @@
 package com.snazhmudinov.movies.fragments
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.PointF
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.support.design.widget.Snackbar
+import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.adapters.CastAdapter
 import com.snazhmudinov.movies.application.MovieApplication
@@ -36,7 +43,11 @@ class MovieFragment: Fragment(), View.OnClickListener {
     @Inject lateinit var mMovieManager: MovieManager
     @Inject lateinit var mDatabaseManager: DatabaseManager
 
-    var movie: Movie? = null
+    companion object {
+        private val WRITE_PERMISSION_REQUEST = 999
+    }
+
+    private var movie: Movie? = null
     private var isLocalPoster = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,7 +80,6 @@ class MovieFragment: Fragment(), View.OnClickListener {
         fab?.setOnClickListener(this)
         trailer_icon?.setOnClickListener(this)
         actors_drop_down?.setOnClickListener(this)
-
     }
 
     private fun setupMovieCast(castList : List<Cast>) {
@@ -109,8 +119,7 @@ class MovieFragment: Fragment(), View.OnClickListener {
                         val localImgPath = it.savedFilePath ?: ""
                         if (localImgPath.isNotEmpty()) {
                             if (deleteImageFromMediaStore(context, localImgPath)) {
-                                mDatabaseManager.deleteMovieFromDb(it)
-                                configureFab(mDatabaseManager.isMovieInDatabase(it))
+                                deleteMovieFromDB(it)
 
                                 if (isLocalPoster) {
                                     val intent = Intent()
@@ -120,20 +129,11 @@ class MovieFragment: Fragment(), View.OnClickListener {
                                 }
                             }
                         } else {
-                            mDatabaseManager.deleteMovieFromDb(it)
-                            configureFab(mDatabaseManager.isMovieInDatabase(it))
+                            deleteMovieFromDB(it)
                         }
                     } else {
                         if (Connectivity.isNetworkAvailable(activity)) {
-                            downloadImageAndGetPath(context, it) {
-                                context.runOnUiThread {
-                                    movie?.let {
-                                        mDatabaseManager.insertMovieIntoDB(it)
-                                        configureFab(mDatabaseManager.isMovieInDatabase(it))
-                                        displaySnackbar()
-                                    }
-                                }
-                            }
+                            saveMovieToDB(it)
                         } else {
                             Connectivity.showNoNetworkToast(activity)
                         }
@@ -156,8 +156,81 @@ class MovieFragment: Fragment(), View.OnClickListener {
         }
     }
 
+    private fun deleteMovieFromDB(movie: Movie) {
+        mDatabaseManager.deleteMovieFromDb(movie)
+        configureFab(mDatabaseManager.isMovieInDatabase(movie))
+    }
+
     private fun setFocusCropRect() {
         val point = PointF(0.5f, 0f)
         poster_container.hierarchy.setActualImageFocusPoint(point)
     }
+
+    private fun saveMovieToDB(movie: Movie) {
+        if (isWritePermissionGranted()) {
+
+            context.runOnUiThread {
+                downloadImageAndGetPath(context, movie) {
+                    context.runOnUiThread {
+                        mDatabaseManager.insertMovieIntoDB(movie)
+                        configureFab(mDatabaseManager.isMovieInDatabase(movie))
+                        displaySnackbar()
+                    }
+                }
+            }
+
+        } else {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                showPermissionDialog()
+
+            } else {
+                requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                        WRITE_PERMISSION_REQUEST)
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when(requestCode) {
+            WRITE_PERMISSION_REQUEST -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    movie?.let { saveMovieToDB(it) }
+                } else {
+                    Toast.makeText(activity, R.string.permission_denied_message, Toast.LENGTH_SHORT).show()
+                }
+                return
+            }
+
+            else -> super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        }
+    }
+
+    private fun showPermissionDialog() {
+        val builder = AlertDialog.Builder(context)
+                .setTitle(R.string.permission_dialog_title)
+                .setMessage(R.string.permission_dialog_message)
+                .setPositiveButton(android.R.string.ok, { dialog, _ ->
+                    dialog.dismiss()
+                    openPermissionScreen()
+                })
+                .setNegativeButton(android.R.string.cancel, { dialog, _ -> dialog.dismiss() })
+
+        builder.create().show()
+    }
+
+    private fun openPermissionScreen() {
+        val intent = Intent()
+        intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+        val uri = Uri.fromParts("package", context.packageName, null)
+        intent.data = uri
+        startActivity(intent)
+    }
+
+    private fun isWritePermissionGranted() =
+            ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
 }

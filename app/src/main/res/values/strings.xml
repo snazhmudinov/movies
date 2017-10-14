@@ -20,10 +20,17 @@
     <string name="upcoming">Upcoming</string>
     <string name="favorite">Favorite</string>
 
+    <!-- Delete operation -->
     <string name="success_deleting_movie">Deleted the movie from database</string>
     <string name="failure_deleting_movie">Failed to delete the movie from database</string>
 
     <string name="empty_table_error">You didn\'t store any movie</string>
     <string name="no_fav_movies_title">No favorite movies saved</string>
     <string name="no_connection">No internet connection</string>
+
+    <!-- Permissions -->
+    <string name="permission_dialog_title">Permission is needed</string>
+    <string name="permission_dialog_message">Please grant the storage permission to be able to save the movie</string>
+    <string name="permission_denied_message">Permission was denied</string>
+
 </resources>

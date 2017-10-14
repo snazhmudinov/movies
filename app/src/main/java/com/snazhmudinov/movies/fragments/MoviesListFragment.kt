@@ -31,7 +31,7 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
     @Inject lateinit var mMovieManager: MovieManager
     @Inject lateinit var mDatabaseManager: DatabaseManager
 
-    @State var currentSelection: String = ""
+    @State var currentSelection: String = Category.popular.name
     private lateinit var dataset: MutableList<Movie>
     private lateinit var adapter: MoviesAdapter
 
@@ -52,10 +52,6 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         initLayoutManager()
-        //if nothing to restore, default the selection
-        if (currentSelection.isEmpty()) {
-            currentSelection = Category.popular.name
-        }
         fetchMovies()
     }
 
@@ -76,16 +72,14 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
         }
     }
 
-    override fun onMovieSelected(movie: Movie?, isLocalImage: Boolean) {
-        if (Connectivity.isNetworkAvailable(activity)) {
-            movie?.let {
-                val intent = Intent(context, MovieActivity::class.java)
-                intent.putExtra(Constants.MOVIE_KEY, it)
-                intent.putExtra(Constants.LOCAL_POSTER, isLocalImage)
-                startActivityForResult(intent, Constants.DELETE_REQUEST_CODE)
-            }
-        } else {
+    override fun onMovieSelected(movie: Movie, isLocalImage: Boolean) {
+        if (!Connectivity.isNetworkAvailable(context) && !currentSelection.equals("favorite", ignoreCase = true)) {
             Connectivity.showNoNetworkToast(activity)
+        } else {
+            val intent = Intent(context, MovieActivity::class.java)
+            intent.putExtra(Constants.MOVIE_KEY, movie)
+            intent.putExtra(Constants.LOCAL_POSTER, isLocalImage)
+            startActivityForResult(intent, Constants.DELETE_REQUEST_CODE)
         }
     }
 

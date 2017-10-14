@@ -73,15 +73,13 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
     }
 
     override fun onMovieSelected(movie: Movie, isLocalImage: Boolean) {
-        if (Connectivity.isNetworkAvailable(activity)) {
-            movie.let {
-                val intent = Intent(context, MovieActivity::class.java)
-                intent.putExtra(Constants.MOVIE_KEY, it)
-                intent.putExtra(Constants.LOCAL_POSTER, isLocalImage)
-                startActivityForResult(intent, Constants.DELETE_REQUEST_CODE)
-            }
-        } else {
+        if (!Connectivity.isNetworkAvailable(context) && !currentSelection.equals("favorite", ignoreCase = true)) {
             Connectivity.showNoNetworkToast(activity)
+        } else {
+            val intent = Intent(context, MovieActivity::class.java)
+            intent.putExtra(Constants.MOVIE_KEY, movie)
+            intent.putExtra(Constants.LOCAL_POSTER, isLocalImage)
+            startActivityForResult(intent, Constants.DELETE_REQUEST_CODE)
         }
     }
 

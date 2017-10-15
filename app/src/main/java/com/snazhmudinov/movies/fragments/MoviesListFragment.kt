@@ -2,9 +2,12 @@ package com.snazhmudinov.movies.fragments
 
 import android.app.Activity
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.LinearSnapHelper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -57,13 +60,19 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
 
     private fun initLayoutManager() {
         //Layout manager region
-        val mLayoutManager = GridLayoutManager(context, 2)
+        val mLayoutManager = if (isLandscapeOrientation()) { LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false) } else { GridLayoutManager(context, 2) }
+        if (isLandscapeOrientation()) {
+            val snapHelper = LinearSnapHelper()
+            snapHelper.attachToRecyclerView(moviesRecyclerView)
+        }
         moviesRecyclerView.layoutManager = mLayoutManager
     }
 
     private fun populateAdapter(isLocalImage: Boolean = false) {
         //Populate & set adapter
         adapter = MoviesAdapter(dataset, context)
+        adapter.mode = if (isLandscapeOrientation()) MoviesAdapter.LANDSCAPE_ORIENTATION
+                            else MoviesAdapter.PORTRAIT_ORIENTATION
         toggleEmptyView(dataset.isEmpty())
         adapter.let {
             it.movieInterface = this
@@ -125,4 +134,7 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
             populateAdapter(isLocalImage = true)
         }
     }
+
+    private fun isLandscapeOrientation() =
+            resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 }

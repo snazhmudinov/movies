@@ -46,7 +46,13 @@ class MovieManager(val context: Context) {
                 if (it.isSuccessful) {
                     val actors = it.body()?.castList
                     if (actors?.isNotEmpty() == true) {
-                        setupCast(actors.subList(0, 5))
+                        setupCast(
+                                if (actors.size > 5) {
+                                    actors.subList(0, 5)
+                                } else {
+                                    actors
+                                }
+                        )
                     }
                 } else {
                     errorToast(response.errorBody().toString())

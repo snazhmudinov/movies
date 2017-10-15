@@ -32,5 +32,7 @@
     <string name="permission_dialog_title">Permission is needed</string>
     <string name="permission_dialog_message">Please grant the storage permission to be able to save the movie</string>
     <string name="permission_denied_message">Permission was denied</string>
+    <string name="permission_layout_txt">Please grant storage permission to read from database</string>
+    <string name="open_permission_screen">Open permission screen</string>
 
 </resources>

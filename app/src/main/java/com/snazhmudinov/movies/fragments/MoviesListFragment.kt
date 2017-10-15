@@ -1,9 +1,15 @@
 package com.snazhmudinov.movies.fragments
 
+import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.GridLayoutManager
 import android.view.LayoutInflater
 import android.view.View
@@ -21,6 +27,7 @@ import com.snazhmudinov.movies.enum.Category
 import com.snazhmudinov.movies.manager.MovieManager
 import com.snazhmudinov.movies.models.Movie
 import kotlinx.android.synthetic.main.fragment_movies_list.*
+import kotlinx.android.synthetic.main.permission_layout.*
 import javax.inject.Inject
 
 /**
@@ -52,6 +59,10 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         initLayoutManager()
+    }
+
+    override fun onResume() {
+        super.onResume()
         fetchMovies()
     }
 
@@ -64,7 +75,8 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
     private fun populateAdapter(isLocalImage: Boolean = false) {
         //Populate & set adapter
         adapter = MoviesAdapter(dataset, context)
-        toggleEmptyView(dataset.isEmpty())
+        toggleEmptyView(isReadPermissionGranted() && dataset.isEmpty())
+        togglePermissionScreen()
         adapter.let {
             it.movieInterface = this
             it.setLocalImage(isLocalImage)
@@ -73,7 +85,7 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
     }
 
     override fun onMovieSelected(movie: Movie, isLocalImage: Boolean) {
-        if (!Connectivity.isNetworkAvailable(context) && !currentSelection.equals("favorite", ignoreCase = true)) {
+        if (!Connectivity.isNetworkAvailable(context) && !isFavoriteCategory()) {
             Connectivity.showNoNetworkToast(activity)
         } else {
             val intent = Intent(context, MovieActivity::class.java)
@@ -115,6 +127,26 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
         }
     }
 
+    private fun togglePermissionScreen() {
+        if (isFavoriteCategory()) {
+            permission_view.visibility = if (isReadPermissionGranted()) {
+                moviesRecyclerView.visibility = View.VISIBLE
+                View.GONE
+            } else {
+                moviesRecyclerView.visibility = View.GONE
+                permission_button.setOnClickListener { context.openPermissionScreen() }
+                View.VISIBLE
+            }
+        } else {
+            moviesRecyclerView.visibility = View.VISIBLE
+            permission_view.visibility = View.GONE
+        }
+    }
+
+    private fun isReadPermissionGranted() =
+            ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) ==
+                    PackageManager.PERMISSION_GRANTED
+
     fun fetchMovies() {
         mMovieManager.getMovies(currentSelection, {
             movies ->
@@ -125,4 +157,14 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
             populateAdapter(isLocalImage = true)
         }
     }
+
+    fun isFavoriteCategory() = currentSelection.equals("favorite", ignoreCase = true)
+}
+
+fun Context.openPermissionScreen() {
+    val intent = Intent()
+    intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+    val uri = Uri.fromParts("package", this.packageName, null)
+    intent.data = uri
+    startActivity(intent)
 }

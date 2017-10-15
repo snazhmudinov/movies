@@ -13,4 +13,9 @@
         layout="@layout/empty_adapter_view"
         android:visibility="gone"/>
 
+    <include
+        android:id="@+id/permission_view"
+        layout="@layout/permission_layout"
+        android:visibility="gone"/>
+
 </FrameLayout>

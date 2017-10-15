@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.graphics.PointF
 import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
 import android.support.design.widget.Snackbar
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
@@ -216,19 +215,11 @@ class MovieFragment: Fragment(), View.OnClickListener {
                 .setMessage(R.string.permission_dialog_message)
                 .setPositiveButton(android.R.string.ok, { dialog, _ ->
                     dialog.dismiss()
-                    openPermissionScreen()
+                    context.openPermissionScreen()
                 })
                 .setNegativeButton(android.R.string.cancel, { dialog, _ -> dialog.dismiss() })
 
         builder.create().show()
-    }
-
-    private fun openPermissionScreen() {
-        val intent = Intent()
-        intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-        val uri = Uri.fromParts("package", context.packageName, null)
-        intent.data = uri
-        startActivity(intent)
     }
 
     private fun isWritePermissionGranted() =

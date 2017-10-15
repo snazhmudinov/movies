@@ -59,10 +59,6 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         initLayoutManager()
-    }
-
-    override fun onResume() {
-        super.onResume()
         fetchMovies()
     }
 

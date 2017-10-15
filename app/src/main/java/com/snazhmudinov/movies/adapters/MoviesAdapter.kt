@@ -10,15 +10,23 @@ import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.constans.Constants
 import com.snazhmudinov.movies.models.Movie
 import kotlinx.android.synthetic.main.movie_rv_item.view.*
+import kotlinx.android.synthetic.main.movie_rv_land_item.view.*
 
 /**
  * Created by snazhmudinov on 5/28/17.
  */
 
-class MoviesAdapter(private val moviesList: List<Movie>, private val mContext: Context) : RecyclerView.Adapter<MoviesAdapter.MovieHolder>() {
+class MoviesAdapter(private val moviesList: List<Movie>,
+                    private val mContext: Context) : RecyclerView.Adapter<MoviesAdapter.MovieHolder>() {
 
     private var isLocalImage = false
     var movieInterface: MovieInterface? = null
+    var mode = PORTRAIT_ORIENTATION
+
+    companion object {
+        val PORTRAIT_ORIENTATION = 0
+        val LANDSCAPE_ORIENTATION = 1
+    }
 
     interface MovieInterface {
         fun onMovieSelected(movie: Movie, isLocalImage: Boolean)
@@ -26,7 +34,10 @@ class MoviesAdapter(private val moviesList: List<Movie>, private val mContext: C
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieHolder {
         val inflater = LayoutInflater.from(mContext)
-        val view = inflater.inflate(R.layout.movie_rv_item, parent, false)
+        val view = when(viewType) {
+            LANDSCAPE_ORIENTATION -> inflater.inflate(R.layout.movie_rv_land_item, parent, false)
+            else -> inflater.inflate(R.layout.movie_rv_item, parent, false)
+        }
 
         return MovieHolder(view)
     }
@@ -38,15 +49,21 @@ class MoviesAdapter(private val moviesList: List<Movie>, private val mContext: C
         else
             Uri.parse(Constants.POSTER_BASE_URL + currentMovie.posterPath)
 
-        holder.itemView.poster.setImageURI(uri)
+        holder.itemView.movie_title?.text = currentMovie.originalTitle
+        holder.itemView.poster?.setImageURI(uri)
+        holder.itemView.poster_land?.setImageURI(uri)
     }
 
     override fun getItemCount() = moviesList.size
 
+    override fun getItemViewType(position: Int) = mode
+
     inner class MovieHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         init {
-            itemView.poster.setOnClickListener { openMovieDetails() }
+            itemView.poster?.setOnClickListener {
+                openMovieDetails()
+            }
         }
 
         fun openMovieDetails() {

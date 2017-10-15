@@ -6,8 +6,7 @@ import com.snazhmudinov.movies.constans.Constants
 /**
  * Created by snazhmudinov on 6/17/17.
  */
-class Cast constructor(castId:String, character:String, creditId:String, gender:String, id:String,
-                        name:String, order:String, profilePath:String) {
+class Cast {
 
     @SerializedName("cast_id")
     var castId : String? = null

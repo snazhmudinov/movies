@@ -154,7 +154,7 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
         }
     }
 
-    fun isFavoriteCategory() = currentSelection.equals("favorite", ignoreCase = true)
+    private fun isFavoriteCategory() = currentSelection.equals("favorite", ignoreCase = true)
 }
 
 fun Context.openPermissionScreen() {

@@ -148,8 +148,8 @@ class MovieFragment: Fragment(), View.OnClickListener {
                 val visibility = cast_recycler_view.visibility
                 cast_recycler_view.visibility = if (visibility == View.VISIBLE) View.GONE else View.VISIBLE
 
-                val drawable = if (cast_recycler_view.visibility == View.VISIBLE) R.drawable.ic_arrow_drop_up
-                else R.drawable.ic_arrow_drop_down
+                val drawable = if (cast_recycler_view.visibility == View.VISIBLE) R.drawable.icon_hide
+                else R.drawable.icon_show
                 actors_drop_down.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawable, 0)
             }
         }

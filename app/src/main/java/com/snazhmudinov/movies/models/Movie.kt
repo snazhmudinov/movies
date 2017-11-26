@@ -16,6 +16,7 @@ data class Movie(@SerializedName("poster_path") var posterPath: String,
                  @SerializedName("original_title") val originalTitle: String,
                  @SerializedName("title") val title: String,
                  @SerializedName("popularity") val popularity: Double,
+                 @SerializedName("vote_average") val averageVote: Double,
                  @SerializedName("vote_count") val voteCount: Int): Parcelable {
 
     val webPosterPath: Uri?
@@ -32,6 +33,7 @@ data class Movie(@SerializedName("poster_path") var posterPath: String,
             parcel.readString(),
             parcel.readString(),
             parcel.readDouble(),
+            parcel.readDouble(),
             parcel.readInt()) {
         savedFilePath = parcel.readString()
         trailer = parcel.readString()
@@ -45,6 +47,7 @@ data class Movie(@SerializedName("poster_path") var posterPath: String,
         parcel.writeString(originalTitle)
         parcel.writeString(title)
         parcel.writeDouble(popularity)
+        parcel.writeDouble(averageVote)
         parcel.writeInt(voteCount)
         parcel.writeString(savedFilePath)
         parcel.writeString(trailer)

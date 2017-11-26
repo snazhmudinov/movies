@@ -25,6 +25,7 @@ class DatabaseManager(val context: Context) {
                     MoviesDatabaseHelper.COLUMN_OVERVIEW to movie.overview,
                     MoviesDatabaseHelper.COLUMN_RELEASE_DATE to movie.releaseDate,
                     MoviesDatabaseHelper.COLUMN_POPULARITY to movie.popularity,
+                    MoviesDatabaseHelper.COLUMN_AVERAGE_VOTE to movie.averageVote,
                     MoviesDatabaseHelper.COLUMN_VOTE_COUNT to movie.voteCount)
         }
     }
@@ -64,10 +65,11 @@ class DatabaseManager(val context: Context) {
                     val overview = getString(getColumnIndex(MoviesDatabaseHelper.COLUMN_OVERVIEW))
                     val releaseDate = getString(getColumnIndex(MoviesDatabaseHelper.COLUMN_RELEASE_DATE))
                     val popularity = getDouble(getColumnIndex(MoviesDatabaseHelper.COLUMN_POPULARITY))
+                    val averageVote = getDouble(getColumnIndex(MoviesDatabaseHelper.COLUMN_AVERAGE_VOTE))
                     val voteCount = getInt(getColumnIndex(MoviesDatabaseHelper.COLUMN_VOTE_COUNT))
 
                     val movie = Movie(posterPath, overview, releaseDate, movieId, movieName,
-                            movieName, popularity, voteCount)
+                            movieName, popularity, averageVote, voteCount)
                     movie.trailer = trailerLink
                     movie.savedFilePath = savedPath
 

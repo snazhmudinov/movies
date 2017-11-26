@@ -69,7 +69,12 @@ class MovieFragment: Fragment(), View.OnClickListener {
             poster_container.setImageURI(posterPath)
 
             setFocusCropRect()
-            mMovieManager.getCast(it) { list -> setupMovieCast(list) }
+            mMovieManager.getCast(it) {
+                list -> setupMovieCast(list)
+
+                //Set movie overview only after the actors were fetched
+                movie_description.text = it.overview
+            }
             configureToolbar()
             configureFab(mDatabaseManager.isMovieInDatabase(it))
 

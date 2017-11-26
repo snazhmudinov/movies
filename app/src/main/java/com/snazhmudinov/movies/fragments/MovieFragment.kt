@@ -31,6 +31,7 @@ import com.snazhmudinov.movies.models.Cast
 import com.snazhmudinov.movies.models.Movie
 import kotlinx.android.synthetic.main.movie_content.*
 import kotlinx.android.synthetic.main.movie_fragment.*
+import kotlinx.android.synthetic.main.rating_view.*
 import org.jetbrains.anko.runOnUiThread
 import javax.inject.Inject
 
@@ -74,6 +75,8 @@ class MovieFragment: Fragment(), View.OnClickListener {
 
                 //Set movie overview only after the actors were fetched
                 movie_description.text = it.overview
+                average_vote.text = "${it.averageVote}/10"
+                overview_rating_container.visibility = View.VISIBLE
             }
             configureToolbar()
             configureFab(mDatabaseManager.isMovieInDatabase(it))

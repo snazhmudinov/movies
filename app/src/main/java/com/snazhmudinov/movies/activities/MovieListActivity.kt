@@ -60,7 +60,7 @@ class MovieListActivity : AppCompatActivity(), ConnectivityBroadcastReceiver.Net
             nav_drawer.setNavigationItemSelectedListener(NavigationView.OnNavigationItemSelectedListener { item ->
                 val category = it.getCategoryForId(item.itemId)
 
-                if (!Connectivity.isNetworkAvailable(this@MovieListActivity) && !category.equals("favorite", ignoreCase = true)) {
+                if (!Connectivity.isNetworkAvailable(this@MovieListActivity) && category.equals("favorite", ignoreCase = true)) {
                     Connectivity.showNoNetworkToast(this@MovieListActivity)
                     drawer_layout.closeDrawers()
                     return@OnNavigationItemSelectedListener false

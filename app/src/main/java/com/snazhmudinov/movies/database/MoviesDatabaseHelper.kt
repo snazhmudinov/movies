@@ -7,7 +7,7 @@ import org.jetbrains.anko.db.*
 /**
  * Created by snazhmudinov on 7/16/17.
  */
-class MoviesDatabaseHelper(context: Context): ManagedSQLiteOpenHelper(context, "MoviesDB_1", null, 1) {
+class MoviesDatabaseHelper(context: Context): ManagedSQLiteOpenHelper(context, "MoviesDB_0", null, 1) {
 
     companion object {
 
@@ -21,6 +21,7 @@ class MoviesDatabaseHelper(context: Context): ManagedSQLiteOpenHelper(context, "
         val COLUMN_OVERVIEW = "overview"
         val COLUMN_RELEASE_DATE = "release_date"
         val COLUMN_POPULARITY = "popularity"
+        val COLUMN_AVERAGE_VOTE = "average_vote"
         val COLUMN_VOTE_COUNT = "vote_count"
 
 
@@ -48,6 +49,7 @@ class MoviesDatabaseHelper(context: Context): ManagedSQLiteOpenHelper(context, "
                 COLUMN_OVERVIEW to TEXT,
                 COLUMN_RELEASE_DATE to TEXT,
                 COLUMN_POPULARITY to REAL,
+                COLUMN_AVERAGE_VOTE to REAL,
                 COLUMN_VOTE_COUNT to INTEGER
         )
     }

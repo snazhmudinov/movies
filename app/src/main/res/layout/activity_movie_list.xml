@@ -5,28 +5,35 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <!-- The main content view -->
-    <RelativeLayout
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             android:background="@color/colorPrimary"
             app:title="@string/app_name"
             app:titleTextColor="@android:color/white"
-            app:navigationIcon="@drawable/icon_menu"/>
+            app:navigationIcon="@drawable/icon_menu" />
 
         <fragment
             android:id="@+id/movies_list_fragment"
             android:name="com.snazhmudinov.movies.fragments.MoviesListFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/toolbar"/>
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
-    </RelativeLayout>
+    </android.support.constraint.ConstraintLayout>
 
     <!-- The navigation drawer -->
    <android.support.design.widget.NavigationView

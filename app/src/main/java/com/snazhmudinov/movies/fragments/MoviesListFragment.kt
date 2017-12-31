@@ -147,10 +147,10 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
         mMovieManager.getMovies(currentSelection, {
             movies ->
             dataset = movies
-            populateAdapter()
+            context?.let { populateAdapter() }
         }) {
             dataset = mDatabaseManager.getAllRecords()
-            populateAdapter(isLocalImage = true)
+            context?.let { populateAdapter(isLocalImage = true) }
         }
     }
 

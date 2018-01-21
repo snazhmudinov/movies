@@ -11,13 +11,16 @@ import android.provider.Settings
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.evernote.android.state.State
 import com.evernote.android.state.StateSaver
+import com.snazhmudinov.movies.MovieListInterface
 import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.activities.MovieActivity
+import com.snazhmudinov.movies.activities.MovieListActivity
 import com.snazhmudinov.movies.adapters.MoviesAdapter
 import com.snazhmudinov.movies.application.MovieApplication
 import com.snazhmudinov.movies.connectivity.Connectivity
@@ -41,6 +44,7 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
     @State var currentSelection: String = Category.popular.name
     private lateinit var dataset: MutableList<Movie>
     private lateinit var adapter: MoviesAdapter
+    private var movieListListener: MovieListInterface? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,20 +61,28 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?) =
             inflater?.inflate(R.layout.fragment_movies_list, container, false)
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onResume() {
+        super.onResume()
+
+        movieListListener = context as? MovieListActivity
+
         initLayoutManager()
         fetchMovies()
     }
 
     private fun initLayoutManager() {
         //Layout manager region
-        val mLayoutManager = GridLayoutManager(context, 2)
+        val mLayoutManager = if (movieListListener?.isTablet() == true) {
+            LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        } else {
+            GridLayoutManager(context, 2)
+        }
         moviesRecyclerView.layoutManager = mLayoutManager
     }
 
     private fun populateAdapter(isLocalImage: Boolean = false) {
         //Populate & set adapter
-        adapter = MoviesAdapter(dataset, context)
+        adapter = MoviesAdapter(dataset, context, movieListListener?.isTablet() == true)
         toggleEmptyView(isReadPermissionGranted() && dataset.isEmpty())
         togglePermissionScreen()
         adapter.let {

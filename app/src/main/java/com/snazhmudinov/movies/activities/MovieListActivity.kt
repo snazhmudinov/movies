@@ -7,13 +7,17 @@ import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.Gravity
+import android.widget.FrameLayout
+import com.snazhmudinov.movies.MovieListInterface
 import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.connectivity.Connectivity
 import com.snazhmudinov.movies.connectivity.ConnectivityBroadcastReceiver
 import com.snazhmudinov.movies.fragments.MoviesListFragment
 import kotlinx.android.synthetic.main.activity_movie_list.*
 
-class MovieListActivity : AppCompatActivity(), ConnectivityBroadcastReceiver.NetworkListenerInterface {
+class MovieListActivity : AppCompatActivity(),
+                          ConnectivityBroadcastReceiver.NetworkListenerInterface,
+                          MovieListInterface {
 
     private var moviesListFragment: MoviesListFragment? = null
     private var connectivityBroadcastReceiver: ConnectivityBroadcastReceiver? = null
@@ -26,15 +30,15 @@ class MovieListActivity : AppCompatActivity(), ConnectivityBroadcastReceiver.Net
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_movie_list)
+    }
+
+    override fun onResume() {
+        super.onResume()
 
         moviesListFragment = supportFragmentManager
                 .findFragmentById(R.id.movies_list_fragment) as MoviesListFragment
 
         setupDrawerContent()
-    }
-
-    override fun onResume() {
-        super.onResume()
         registerNetworkListener()
     }
 
@@ -92,4 +96,6 @@ class MovieListActivity : AppCompatActivity(), ConnectivityBroadcastReceiver.Net
         if (!isNetworkAvailable) { noInternetSnackbar.show() }
         wasDisconnectedBefore = !isNetworkAvailable
     }
+
+    override fun isTablet() = movie_fragment_container != null
 }

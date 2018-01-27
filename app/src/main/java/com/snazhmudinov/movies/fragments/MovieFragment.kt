@@ -64,7 +64,7 @@ class MovieFragment: Fragment(), View.OnClickListener {
         isLocalPoster = activity.intent.getBooleanExtra(Constants.LOCAL_POSTER, false)
 
         movie?.let {
-            toolbar_layout.title = it.originalTitle
+            toolbar_layout?.title = it.originalTitle
 
             val posterPath = if (isLocalPoster) Uri.parse(it.savedFilePath) else it.webPosterPath
             poster_container.setImageURI(posterPath)
@@ -108,7 +108,7 @@ class MovieFragment: Fragment(), View.OnClickListener {
 
     private fun configureToolbar() {
         (activity as AppCompatActivity).setSupportActionBar(movie_toolbar)
-        movie_toolbar.setNavigationOnClickListener {
+        movie_toolbar?.setNavigationOnClickListener {
             activity.finish()
         }
     }

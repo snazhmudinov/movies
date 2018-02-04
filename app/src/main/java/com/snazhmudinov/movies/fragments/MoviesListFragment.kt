@@ -42,6 +42,7 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
     @Inject lateinit var mDatabaseManager: DatabaseManager
 
     @State var currentSelection: String = Category.popular.name
+    @State var movieIndex = 0
     private lateinit var dataset: MutableList<Movie>
     private lateinit var adapter: MoviesAdapter
     private var movieListListener: MovieListInterface? = null
@@ -99,6 +100,10 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
             it.movieInterface = this
             it.setLocalImage(isLocalImage)
             moviesRecyclerView.adapter = it
+            it.indexOfSelectedMovie = movieIndex
+            if (movieListListener?.isTablet() == true) {
+                movieListListener?.loadMovie(dataset[movieIndex], isLocalImage)
+            }
         }
     }
 
@@ -106,10 +111,15 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
         if (!Connectivity.isNetworkAvailable(context) && !isFavoriteCategory()) {
             Connectivity.showNoNetworkToast(activity)
         } else {
-            val intent = Intent(context, MovieActivity::class.java)
-            intent.putExtra(Constants.MOVIE_KEY, movie)
-            intent.putExtra(Constants.LOCAL_POSTER, isLocalImage)
-            startActivityForResult(intent, Constants.DELETE_REQUEST_CODE)
+            if (movieListListener?.isTablet() == true) {
+                if (movieIndex != dataset.indexOf(movie)) { movieListListener?.loadMovie(movie, isLocalImage) }
+            } else {
+                val intent = Intent(context, MovieActivity::class.java)
+                intent.putExtra(Constants.MOVIE_KEY, movie)
+                intent.putExtra(Constants.LOCAL_POSTER, isLocalImage)
+                startActivityForResult(intent, Constants.DELETE_REQUEST_CODE)
+            }
+            movieIndex = adapter.indexOfSelectedMovie
         }
     }
 

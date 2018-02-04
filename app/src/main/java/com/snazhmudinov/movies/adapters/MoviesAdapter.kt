@@ -2,6 +2,7 @@ package com.snazhmudinov.movies.adapters
 
 import android.content.Context
 import android.net.Uri
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +21,11 @@ class MoviesAdapter(private val moviesList: List<Movie>, private val mContext: C
 
     private var isLocalImage = false
     var movieInterface: MovieInterface? = null
+    var indexOfSelectedMovie: Int = 0
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
 
     interface MovieInterface {
         fun onMovieSelected(movie: Movie, isLocalImage: Boolean)
@@ -46,18 +52,21 @@ class MoviesAdapter(private val moviesList: List<Movie>, private val mContext: C
         holder.itemView.poster.setImageURI(uri)
         holder.itemView.movie_title?.text = currentMovie.originalTitle
         holder.itemView.additional_info?.text = formatMovieDate(currentMovie)
+
+        val backgroundColor = if (position == indexOfSelectedMovie) ContextCompat.getColor(mContext, R.color.gray_selector)
+                              else ContextCompat.getColor(mContext, android.R.color.transparent)
+        holder.itemView.setBackgroundColor(backgroundColor)
     }
 
     override fun getItemCount() = moviesList.size
 
     inner class MovieHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        init {
-            itemView.setOnClickListener { openMovieDetails() }
-        }
+        init { itemView.setOnClickListener { openMovieDetails() } }
 
         private fun openMovieDetails() {
             val movie = moviesList[adapterPosition]
+            indexOfSelectedMovie = adapterPosition
             movieInterface?.onMovieSelected(movie, isLocalImage)
         }
     }

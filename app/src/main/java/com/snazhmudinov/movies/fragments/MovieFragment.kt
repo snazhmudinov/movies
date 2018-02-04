@@ -68,8 +68,10 @@ class MovieFragment: Fragment(), View.OnClickListener {
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        movie = activity.intent.getParcelableExtra(Constants.MOVIE_KEY)
-        isLocalPoster = activity.intent.getBooleanExtra(Constants.LOCAL_POSTER, false)
+        if (movie == null) {
+            movie = activity.intent.getParcelableExtra(Constants.MOVIE_KEY)
+            isLocalPoster = activity.intent.getBooleanExtra(Constants.LOCAL_POSTER, false)
+        }
 
         movie?.let {
             toolbar_layout?.title = it.originalTitle

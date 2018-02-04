@@ -23,7 +23,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.MovieActivity"
-                  android:theme="@style/MoviesTheme"/>
+                  android:theme="@style/MoviesTheme"
+                  android:configChanges="orientation|screenSize" />
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="6bdb393886c15d93dc416ef8dd4f20ebc0da75aa" />

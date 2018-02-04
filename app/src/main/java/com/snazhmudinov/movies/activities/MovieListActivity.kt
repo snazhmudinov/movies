@@ -11,7 +11,9 @@ import com.snazhmudinov.movies.MovieListInterface
 import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.connectivity.Connectivity
 import com.snazhmudinov.movies.connectivity.ConnectivityBroadcastReceiver
+import com.snazhmudinov.movies.fragments.MovieFragment
 import com.snazhmudinov.movies.fragments.MoviesListFragment
+import com.snazhmudinov.movies.models.Movie
 import kotlinx.android.synthetic.main.activity_movie_list.*
 
 class MovieListActivity : AppCompatActivity(),
@@ -82,6 +84,7 @@ class MovieListActivity : AppCompatActivity(),
                 }
 
                 it.currentSelection = category
+                it.movieIndex = 0
                 it.fetchMovies()
                 item.isChecked = true
                 drawer_layout.closeDrawers()
@@ -109,4 +112,10 @@ class MovieListActivity : AppCompatActivity(),
     }
 
     override fun isTablet() = movie_fragment_container != null
+
+    override fun loadMovie(movie: Movie, localImage: Boolean) {
+        supportFragmentManager.beginTransaction()
+                .replace(R.id.movie_fragment_container, MovieFragment.newInstance(movie, localImage))
+                .commit()
+    }
 }

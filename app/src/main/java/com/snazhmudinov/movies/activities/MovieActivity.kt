@@ -1,5 +1,6 @@
 package com.snazhmudinov.movies.activities
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.snazhmudinov.movies.R
@@ -13,5 +14,12 @@ class MovieActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_movie)
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+        newConfig?.let {
+            if (it.orientation == Configuration.ORIENTATION_LANDSCAPE) { finish() }
+        }
     }
 }

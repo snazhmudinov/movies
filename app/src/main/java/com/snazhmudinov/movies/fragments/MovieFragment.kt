@@ -44,7 +44,15 @@ class MovieFragment: Fragment(), View.OnClickListener {
     @Inject lateinit var mDatabaseManager: DatabaseManager
 
     companion object {
-        private val WRITE_PERMISSION_REQUEST = 999
+        private const val WRITE_PERMISSION_REQUEST = 999
+
+        fun newInstance(movie: Movie, isLocalImage: Boolean): MovieFragment {
+            val fragment = MovieFragment()
+            fragment.movie = movie
+            fragment.isLocalPoster = isLocalImage
+
+            return fragment
+        }
     }
 
     private var movie: Movie? = null

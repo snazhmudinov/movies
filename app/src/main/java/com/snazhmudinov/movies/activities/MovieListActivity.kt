@@ -7,7 +7,6 @@ import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.Gravity
-import android.widget.FrameLayout
 import com.snazhmudinov.movies.MovieListInterface
 import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.connectivity.Connectivity
@@ -30,27 +29,32 @@ class MovieListActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_movie_list)
-    }
-
-    override fun onResume() {
-        super.onResume()
 
         moviesListFragment = supportFragmentManager
                 .findFragmentById(R.id.movies_list_fragment) as MoviesListFragment
 
         setupDrawerContent()
+    }
+
+    override fun onResume() {
+        super.onResume()
         registerNetworkListener()
     }
 
     override fun onPause() {
-        connectivityBroadcastReceiver?.let { unregisterReceiver(it) }
-        connectivityBroadcastReceiver = null
+        connectivityBroadcastReceiver?.let {
+            unregisterReceiver(it)
+            connectivityBroadcastReceiver = null
+        }
+
         super.onPause()
     }
 
     private fun setupDrawerContent() {
         //Setup toolbar
         setSupportActionBar(toolbar)
+        toolbar.setSubtitleTextAppearance(this, R.style.ToolbarSubtitle)
+        toolbar.subtitle = getString(resources.getIdentifier(moviesListFragment?.currentSelection, "string", packageName))
         toolbar.setNavigationOnClickListener {
             if (!drawer_layout.isDrawerOpen(Gravity.START)) {
                 drawer_layout.openDrawer(Gravity.START)
@@ -64,6 +68,12 @@ class MovieListActivity : AppCompatActivity(),
             nav_drawer.setNavigationItemSelectedListener(NavigationView.OnNavigationItemSelectedListener { item ->
                 val category = it.getCategoryForId(item.itemId)
 
+                /* Don't re-fetch already shown movies */
+                if (category == it.currentSelection) {
+                    drawer_layout.closeDrawers()
+                    return@OnNavigationItemSelectedListener false
+                }
+
                 if (!Connectivity.isNetworkAvailable(this@MovieListActivity) &&
                         !category.equals("favorite", ignoreCase = true)) {
                     Connectivity.showNoNetworkToast(this@MovieListActivity)
@@ -75,6 +85,7 @@ class MovieListActivity : AppCompatActivity(),
                 it.fetchMovies()
                 item.isChecked = true
                 drawer_layout.closeDrawers()
+                toolbar.subtitle = getString(resources.getIdentifier(category, "string", packageName))
                 true
             })
         }

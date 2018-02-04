@@ -46,10 +46,22 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
     private lateinit var adapter: MoviesAdapter
     private var movieListListener: MovieListInterface? = null
 
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        movieListListener = context as? MovieListActivity
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        movieListListener = null
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (activity.application as MovieApplication).appComponents.inject(this)
         StateSaver.restoreInstanceState(this, savedInstanceState)
+
+        (activity.application as MovieApplication).appComponents.inject(this)
+
         retainInstance = true
     }
 
@@ -61,10 +73,8 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?) =
             inflater?.inflate(R.layout.fragment_movies_list, container, false)
 
-    override fun onResume() {
-        super.onResume()
-
-        movieListListener = context as? MovieListActivity
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
 
         initLayoutManager()
         fetchMovies()

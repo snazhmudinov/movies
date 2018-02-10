@@ -72,7 +72,8 @@ class MovieManager(val context: Context) {
         call.enqueue(callback { response, throwable ->
             response?.let {
                 if(it.isSuccessful) {
-                    val trailer = it.body()?.results?.get(0)?.trailerURL
+                    val trailer = if (it.body()?.results?.isNotEmpty() == true)
+                        it.body()?.results?.get(0)?.trailerURL else null
                     trailer?.let {
                         playTrailer(it)
                     }

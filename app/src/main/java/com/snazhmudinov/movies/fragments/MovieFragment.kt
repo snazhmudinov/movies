@@ -159,7 +159,13 @@ class MovieFragment: Fragment(), View.OnClickListener {
             }
 
             R.id.trailer_icon -> {
-                movie?.let { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it.trailer))) }
+                movie?.let {
+                    if (it.trailer != null) {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it.trailer)))
+                    } else {
+                        Toast.makeText(context, "No trailer found for this movie", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
 
             R.id.actors_drop_down -> {

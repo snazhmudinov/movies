@@ -83,7 +83,7 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
 
     private fun initLayoutManager() {
         //Layout manager region
-        val mLayoutManager = if (movieListListener?.isTablet() == true) {
+        val mLayoutManager = if (movieListListener?.isMasterPaneMode() == true) {
             LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         } else {
             GridLayoutManager(context, 2)
@@ -91,16 +91,16 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
         moviesRecyclerView.layoutManager = mLayoutManager
     }
 
-    private fun populateAdapter(/*isLocalImage: Boolean = false*/) {
+    private fun populateAdapter() {
         //Populate & set adapter
-        adapter = MoviesAdapter(dataset, context, movieListListener?.isTablet() == true)
+        adapter = MoviesAdapter(dataset, context, movieListListener?.isMasterPaneMode() == true)
         toggleEmptyView(isReadPermissionGranted() && dataset.isEmpty())
         togglePermissionScreen()
         adapter.let {
             it.movieInterface = this
             moviesRecyclerView.adapter = it
             it.indexOfSelectedMovie = movieIndex
-            if (movieListListener?.isTablet() == true && dataset.isNotEmpty()) {
+            if (movieListListener?.isMasterPaneMode() == true && dataset.isNotEmpty()) {
                 movieListListener?.loadMovie(dataset[movieIndex])
             }
         }
@@ -110,7 +110,7 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
         if (!Connectivity.isNetworkAvailable(context) && !isFavoriteCategory()) {
             Connectivity.showNoNetworkToast(activity)
         } else {
-            if (movieListListener?.isTablet() == true) {
+            if (movieListListener?.isMasterPaneMode() == true) {
                 if (movieIndex != dataset.indexOf(movie)) { movieListListener?.loadMovie(movie) }
             } else {
                 val intent = Intent(context, MovieActivity::class.java)
@@ -141,7 +141,7 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
             adapter.notifyItemRemoved(index)
             toggleEmptyView(dataset.isEmpty())
 
-            if (movieListListener?.isTablet() == true && dataset.isNotEmpty()) {
+            if (movieListListener?.isMasterPaneMode() == true && dataset.isNotEmpty()) {
                 adapter.indexOfSelectedMovie = 0
                 movieListListener?.loadMovie(dataset[0])
             }

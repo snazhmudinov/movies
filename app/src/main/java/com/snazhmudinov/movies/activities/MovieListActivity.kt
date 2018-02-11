@@ -112,7 +112,7 @@ class MovieListActivity : AppCompatActivity(),
         wasDisconnectedBefore = !isNetworkAvailable
     }
 
-    override fun isTablet() = movie_fragment_container != null
+    override fun isMasterPaneMode() = movie_fragment_container != null
 
     override fun loadMovie(movie: Movie) {
         supportFragmentManager.beginTransaction()

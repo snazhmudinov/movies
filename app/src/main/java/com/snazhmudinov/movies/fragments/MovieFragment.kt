@@ -145,7 +145,7 @@ class MovieFragment: Fragment(), View.OnClickListener {
                                     val intent = Intent()
                                     intent.putExtra(Constants.MOVIE_TO_DELETE, it)
                                     activity.setResult(Activity.RESULT_OK, intent)
-                                    if (movieListListener?.isTablet() == true) {
+                                    if (movieListListener?.isMasterPaneMode() == true) {
                                       movieListListener?.onDeleteMovie(it)
                                     } else { activity.finish() }
                                 }

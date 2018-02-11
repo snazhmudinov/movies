@@ -7,5 +7,7 @@ import com.snazhmudinov.movies.models.Movie
  */
 interface MovieListInterface {
     fun isTablet(): Boolean
-    fun loadMovie(movie: Movie, localImage: Boolean)
+    fun loadMovie(movie: Movie)
+    fun showEmpty(show: Boolean)
+    fun onDeleteMovie(movie: Movie)
 }

@@ -19,7 +19,6 @@ import java.text.DateFormatSymbols
 
 class MoviesAdapter(private val moviesList: List<Movie>, private val mContext: Context, private val isTablet: Boolean) : RecyclerView.Adapter<MoviesAdapter.MovieHolder>() {
 
-    private var isLocalImage = false
     var movieInterface: MovieInterface? = null
     var indexOfSelectedMovie: Int = 0
         set(value) {
@@ -28,7 +27,7 @@ class MoviesAdapter(private val moviesList: List<Movie>, private val mContext: C
         }
 
     interface MovieInterface {
-        fun onMovieSelected(movie: Movie, isLocalImage: Boolean)
+        fun onMovieSelected(movie: Movie)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieHolder {
@@ -44,10 +43,8 @@ class MoviesAdapter(private val moviesList: List<Movie>, private val mContext: C
 
     override fun onBindViewHolder(holder: MovieHolder, position: Int) {
         val currentMovie = moviesList[position]
-        val uri = if (isLocalImage)
-            Uri.parse(currentMovie.savedFilePath)
-        else
-            Uri.parse(Constants.POSTER_BASE_URL + currentMovie.posterPath)
+        val uri = if (currentMovie.savedFilePath == null) { Uri.parse(Constants.POSTER_BASE_URL + currentMovie.posterPath) }
+                    else { Uri.parse(currentMovie.savedFilePath) }
 
         holder.itemView.poster.setImageURI(uri)
         holder.itemView.movie_title?.text = currentMovie.originalTitle
@@ -67,12 +64,8 @@ class MoviesAdapter(private val moviesList: List<Movie>, private val mContext: C
         private fun openMovieDetails() {
             val movie = moviesList[adapterPosition]
             indexOfSelectedMovie = adapterPosition
-            movieInterface?.onMovieSelected(movie, isLocalImage)
+            movieInterface?.onMovieSelected(movie)
         }
-    }
-
-    fun setLocalImage(value: Boolean) {
-        isLocalImage = value
     }
 
     private fun formatMovieDate(movie: Movie): String {

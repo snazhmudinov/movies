@@ -2,6 +2,7 @@ package com.snazhmudinov.movies.fragments
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.PointF
@@ -18,7 +19,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.snazhmudinov.movies.MovieListInterface
 import com.snazhmudinov.movies.R
+import com.snazhmudinov.movies.activities.MovieListActivity
 import com.snazhmudinov.movies.adapters.CastAdapter
 import com.snazhmudinov.movies.application.MovieApplication
 import com.snazhmudinov.movies.connectivity.Connectivity
@@ -46,21 +49,24 @@ class MovieFragment: Fragment(), View.OnClickListener {
     companion object {
         private const val WRITE_PERMISSION_REQUEST = 999
 
-        fun newInstance(movie: Movie, isLocalImage: Boolean): MovieFragment {
+        fun newInstance(movie: Movie): MovieFragment {
             val fragment = MovieFragment()
             fragment.movie = movie
-            fragment.isLocalPoster = isLocalImage
-
             return fragment
         }
     }
 
     private var movie: Movie? = null
-    private var isLocalPoster = false
+    private var movieListListener: MovieListInterface? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         (activity.application as MovieApplication).appComponents.inject(this)
+    }
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        movieListListener = context as? MovieListActivity
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?) =
@@ -68,15 +74,12 @@ class MovieFragment: Fragment(), View.OnClickListener {
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (movie == null) {
-            movie = activity.intent.getParcelableExtra(Constants.MOVIE_KEY)
-            isLocalPoster = activity.intent.getBooleanExtra(Constants.LOCAL_POSTER, false)
-        }
+        if (movie == null) { movie = activity.intent.getParcelableExtra(Constants.MOVIE_KEY) }
 
         movie?.let {
             toolbar_layout?.title = it.originalTitle
 
-            val posterPath = if (isLocalPoster) Uri.parse(it.savedFilePath) else it.webPosterPath
+            val posterPath = if (it.savedFilePath == null) { it.webPosterPath } else Uri.parse(it.savedFilePath)
             poster_container.setImageURI(posterPath)
 
             setFocusCropRect()
@@ -138,11 +141,13 @@ class MovieFragment: Fragment(), View.OnClickListener {
                             if (deleteImageFromMediaStore(context, localImgPath)) {
                                 deleteMovieFromDB(it)
 
-                                if (isLocalPoster) {
+                                if (it.savedFilePath != null) {
                                     val intent = Intent()
                                     intent.putExtra(Constants.MOVIE_TO_DELETE, it)
                                     activity.setResult(Activity.RESULT_OK, intent)
-                                    activity.finish()
+                                    if (movieListListener?.isTablet() == true) {
+                                      movieListListener?.onDeleteMovie(it)
+                                    } else { activity.finish() }
                                 }
                             }
                         } else {

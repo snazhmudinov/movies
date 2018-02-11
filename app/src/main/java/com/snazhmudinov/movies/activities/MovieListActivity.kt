@@ -7,6 +7,7 @@ import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.Gravity
+import android.view.View
 import com.snazhmudinov.movies.MovieListInterface
 import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.connectivity.Connectivity
@@ -113,9 +114,17 @@ class MovieListActivity : AppCompatActivity(),
 
     override fun isTablet() = movie_fragment_container != null
 
-    override fun loadMovie(movie: Movie, localImage: Boolean) {
+    override fun loadMovie(movie: Movie) {
         supportFragmentManager.beginTransaction()
-                .replace(R.id.movie_fragment_container, MovieFragment.newInstance(movie, localImage))
+                .replace(R.id.movie_fragment_container, MovieFragment.newInstance(movie))
                 .commit()
+    }
+
+    override fun showEmpty(show: Boolean) {
+        movie_fragment_container?.visibility = if (show) View.GONE else View.VISIBLE
+    }
+
+    override fun onDeleteMovie(movie: Movie) {
+        moviesListFragment?.performDeleteMovieOperation(movie)
     }
 }

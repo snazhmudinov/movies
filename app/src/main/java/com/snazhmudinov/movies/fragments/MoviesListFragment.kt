@@ -91,32 +91,30 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
         moviesRecyclerView.layoutManager = mLayoutManager
     }
 
-    private fun populateAdapter(isLocalImage: Boolean = false) {
+    private fun populateAdapter(/*isLocalImage: Boolean = false*/) {
         //Populate & set adapter
         adapter = MoviesAdapter(dataset, context, movieListListener?.isTablet() == true)
         toggleEmptyView(isReadPermissionGranted() && dataset.isEmpty())
         togglePermissionScreen()
         adapter.let {
             it.movieInterface = this
-            it.setLocalImage(isLocalImage)
             moviesRecyclerView.adapter = it
             it.indexOfSelectedMovie = movieIndex
-            if (movieListListener?.isTablet() == true) {
-                movieListListener?.loadMovie(dataset[movieIndex], isLocalImage)
+            if (movieListListener?.isTablet() == true && dataset.isNotEmpty()) {
+                movieListListener?.loadMovie(dataset[movieIndex])
             }
         }
     }
 
-    override fun onMovieSelected(movie: Movie, isLocalImage: Boolean) {
+    override fun onMovieSelected(movie: Movie/*, isLocalImage: Boolean*/) {
         if (!Connectivity.isNetworkAvailable(context) && !isFavoriteCategory()) {
             Connectivity.showNoNetworkToast(activity)
         } else {
             if (movieListListener?.isTablet() == true) {
-                if (movieIndex != dataset.indexOf(movie)) { movieListListener?.loadMovie(movie, isLocalImage) }
+                if (movieIndex != dataset.indexOf(movie)) { movieListListener?.loadMovie(movie) }
             } else {
                 val intent = Intent(context, MovieActivity::class.java)
                 intent.putExtra(Constants.MOVIE_KEY, movie)
-                intent.putExtra(Constants.LOCAL_POSTER, isLocalImage)
                 startActivityForResult(intent, Constants.DELETE_REQUEST_CODE)
             }
             movieIndex = adapter.indexOfSelectedMovie
@@ -130,13 +128,22 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
             Constants.DELETE_REQUEST_CODE -> {
                 if (resultCode == Activity.RESULT_OK) {
                     val movieToDelete = data?.getParcelableExtra<Movie>(Constants.MOVIE_TO_DELETE)
-                    movieToDelete?.let {
-                        val index = dataset.indexOf(it)
-                        dataset.remove(it)
-                        adapter.notifyItemRemoved(index)
-                        toggleEmptyView(dataset.isEmpty())
-                    }
+                    performDeleteMovieOperation(movieToDelete)
                 }
+            }
+        }
+    }
+
+    fun performDeleteMovieOperation(movie: Movie?) {
+        movie?.let {
+            val index = dataset.indexOf(it)
+            dataset.remove(it)
+            adapter.notifyItemRemoved(index)
+            toggleEmptyView(dataset.isEmpty())
+
+            if (movieListListener?.isTablet() == true && dataset.isNotEmpty()) {
+                adapter.indexOfSelectedMovie = 0
+                movieListListener?.loadMovie(dataset[0])
             }
         }
     }
@@ -146,6 +153,8 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
     fun getIdOfCategory(category: String) = Category.valueOf(category).id
 
     private fun toggleEmptyView(show: Boolean) {
+        movieListListener?.showEmpty(show)
+
         empty_rv_container?.visibility = if (show) {
             moviesRecyclerView?.visibility = View.GONE
             View.VISIBLE
@@ -182,7 +191,7 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
             context?.let { populateAdapter() }
         }) {
             dataset = mDatabaseManager.getAllRecords()
-            context?.let { populateAdapter(isLocalImage = true) }
+            context?.let { populateAdapter() }
         }
     }
 

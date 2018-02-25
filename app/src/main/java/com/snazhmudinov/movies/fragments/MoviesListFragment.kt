@@ -61,18 +61,18 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
         super.onCreate(savedInstanceState)
         StateSaver.restoreInstanceState(this, savedInstanceState)
 
-        (activity.application as MovieApplication).appComponents.inject(this)
+        (activity?.application as MovieApplication).appComponents.inject(this)
 
         retainInstance = true
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
+    override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         StateSaver.saveInstanceState(this, outState as Bundle)
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?) =
-            inflater?.inflate(R.layout.fragment_movies_list, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+            inflater.inflate(R.layout.fragment_movies_list, container, false)
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -93,6 +93,7 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
 
     private fun populateAdapter() {
         //Populate & set adapter
+        val context = context?.let { it } ?: return
         adapter = MoviesAdapter(dataset, context, movieListListener?.isMasterPaneMode() == true)
         toggleEmptyView(isReadPermissionGranted() && dataset.isEmpty())
         togglePermissionScreen()
@@ -107,8 +108,10 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
     }
 
     override fun onMovieSelected(movie: Movie/*, isLocalImage: Boolean*/) {
+        val context = context?.let { it } ?: return
+
         if (!Connectivity.isNetworkAvailable(context) && !isFavoriteCategory()) {
-            Connectivity.showNoNetworkToast(activity)
+            Connectivity.showNoNetworkToast(context)
         } else {
             if (movieListListener?.isMasterPaneMode() == true) {
                 if (movieIndex != dataset.indexOf(movie)) { movieListListener?.loadMovie(movie) }
@@ -171,7 +174,7 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
                 View.GONE
             } else {
                 moviesRecyclerView.visibility = View.GONE
-                permission_button.setOnClickListener { context.openPermissionScreen() }
+                permission_button.setOnClickListener { context?.openPermissionScreen() }
                 View.VISIBLE
             }
         } else {
@@ -181,7 +184,7 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
     }
 
     private fun isReadPermissionGranted() =
-            ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) ==
+            ContextCompat.checkSelfPermission(activity!!, Manifest.permission.READ_EXTERNAL_STORAGE) ==
                     PackageManager.PERMISSION_GRANTED
 
     fun fetchMovies() {

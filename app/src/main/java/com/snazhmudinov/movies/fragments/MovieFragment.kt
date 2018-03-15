@@ -2,6 +2,7 @@ package com.snazhmudinov.movies.fragments
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.PointF
@@ -18,7 +19,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.snazhmudinov.movies.MovieListInterface
 import com.snazhmudinov.movies.R
+import com.snazhmudinov.movies.activities.MovieListActivity
 import com.snazhmudinov.movies.adapters.CastAdapter
 import com.snazhmudinov.movies.application.MovieApplication
 import com.snazhmudinov.movies.connectivity.Connectivity
@@ -44,29 +47,39 @@ class MovieFragment: Fragment(), View.OnClickListener {
     @Inject lateinit var mDatabaseManager: DatabaseManager
 
     companion object {
-        private val WRITE_PERMISSION_REQUEST = 999
+        private const val WRITE_PERMISSION_REQUEST = 999
+
+        fun newInstance(movie: Movie): MovieFragment {
+            val fragment = MovieFragment()
+            fragment.movie = movie
+            return fragment
+        }
     }
 
     private var movie: Movie? = null
-    private var isLocalPoster = false
+    private var movieListListener: MovieListInterface? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (activity.application as MovieApplication).appComponents.inject(this)
+        (activity?.application as MovieApplication).appComponents.inject(this)
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?) =
-            inflater?.inflate(R.layout.movie_fragment, container, false)
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        movieListListener = context as? MovieListActivity
+    }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+            inflater.inflate(R.layout.movie_fragment, container, false)
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        movie = activity.intent.getParcelableExtra(Constants.MOVIE_KEY)
-        isLocalPoster = activity.intent.getBooleanExtra(Constants.LOCAL_POSTER, false)
+        if (movie == null) { movie = activity?.intent?.getParcelableExtra(Constants.MOVIE_KEY) }
 
         movie?.let {
-            toolbar_layout.title = it.originalTitle
+            toolbar_layout?.title = it.originalTitle
 
-            val posterPath = if (isLocalPoster) Uri.parse(it.savedFilePath) else it.webPosterPath
+            val posterPath = if (it.savedFilePath == null) { it.webPosterPath } else Uri.parse(it.savedFilePath)
             poster_container.setImageURI(posterPath)
 
             setFocusCropRect()
@@ -90,9 +103,11 @@ class MovieFragment: Fragment(), View.OnClickListener {
     }
 
     private fun setupMovieCast(castList : List<Cast>) {
-        cast_recycler_view.layoutManager = LinearLayoutManager(context)
-        val castAdapter = CastAdapter(castList, context)
-        cast_recycler_view.adapter = castAdapter
+        context?.let {
+            cast_recycler_view.layoutManager = LinearLayoutManager(it)
+            val castAdapter = CastAdapter(castList, it)
+            cast_recycler_view.adapter = castAdapter
+        }
     }
 
     private fun displaySnackbar() {
@@ -108,8 +123,8 @@ class MovieFragment: Fragment(), View.OnClickListener {
 
     private fun configureToolbar() {
         (activity as AppCompatActivity).setSupportActionBar(movie_toolbar)
-        movie_toolbar.setNavigationOnClickListener {
-            activity.finish()
+        movie_toolbar?.setNavigationOnClickListener {
+            activity?.finish()
         }
     }
 
@@ -119,6 +134,8 @@ class MovieFragment: Fragment(), View.OnClickListener {
     }
 
     override fun onClick(v: View?) {
+        val context = context?.let { it } ?: return
+
         when(v?.id) {
             R.id.fab -> {
                 movie?.let {
@@ -128,28 +145,36 @@ class MovieFragment: Fragment(), View.OnClickListener {
                             if (deleteImageFromMediaStore(context, localImgPath)) {
                                 deleteMovieFromDB(it)
 
-                                if (isLocalPoster) {
+                                if (it.savedFilePath != null) {
                                     val intent = Intent()
                                     intent.putExtra(Constants.MOVIE_TO_DELETE, it)
-                                    activity.setResult(Activity.RESULT_OK, intent)
-                                    activity.finish()
+                                    activity?.setResult(Activity.RESULT_OK, intent)
+                                    if (movieListListener?.isMasterPaneMode() == true) {
+                                      movieListListener?.onDeleteMovie(it)
+                                    } else { activity?.finish() }
                                 }
                             }
                         } else {
                             deleteMovieFromDB(it)
                         }
                     } else {
-                        if (Connectivity.isNetworkAvailable(activity)) {
+                        if (Connectivity.isNetworkAvailable(context)) {
                             saveMovieToDB(it)
                         } else {
-                            Connectivity.showNoNetworkToast(activity)
+                            Connectivity.showNoNetworkToast(context)
                         }
                     }
                 }
             }
 
             R.id.trailer_icon -> {
-                movie?.let { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it.trailer))) }
+                movie?.let {
+                    if (it.trailer != null) {
+                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it.trailer)))
+                    } else {
+                        Toast.makeText(context, "No trailer found for this movie", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
 
             R.id.actors_drop_down -> {
@@ -174,8 +199,9 @@ class MovieFragment: Fragment(), View.OnClickListener {
     }
 
     private fun saveMovieToDB(movie: Movie) {
-        if (isWritePermissionGranted()) {
+        val context = context?.let { it } ?: return
 
+        if (isWritePermissionGranted()) {
             context.runOnUiThread {
                 downloadImageAndGetPath(context, movie) {
                     context.runOnUiThread {
@@ -188,7 +214,7 @@ class MovieFragment: Fragment(), View.OnClickListener {
 
         } else {
 
-            if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
+            if (ActivityCompat.shouldShowRequestPermissionRationale(activity!!,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
                 // Show an explanation to the user *asynchronously* -- don't block
                 // this thread waiting for the user's response! After the user
@@ -218,6 +244,8 @@ class MovieFragment: Fragment(), View.OnClickListener {
     }
 
     private fun showPermissionDialog() {
+        val context = context?.let { it } ?: return
+
         val builder = AlertDialog.Builder(context)
                 .setTitle(R.string.permission_dialog_title)
                 .setMessage(R.string.permission_dialog_message)
@@ -231,5 +259,5 @@ class MovieFragment: Fragment(), View.OnClickListener {
     }
 
     private fun isWritePermissionGranted() =
-            ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+            ContextCompat.checkSelfPermission(activity!!, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
 }

@@ -15,6 +15,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.LinearSnapHelper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,6 +24,7 @@ import com.snazhmudinov.movies.MovieListInterface
 import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.activities.MovieListActivity
 import com.snazhmudinov.movies.adapters.CastAdapter
+import com.snazhmudinov.movies.adapters.TrailersAdapter
 import com.snazhmudinov.movies.application.MovieApplication
 import com.snazhmudinov.movies.connectivity.Connectivity
 import com.snazhmudinov.movies.constans.Constants
@@ -41,7 +43,7 @@ import javax.inject.Inject
 /**
  * Created by snazhmudinov on 7/23/17.
  */
-class MovieFragment: Fragment(), View.OnClickListener {
+class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerInterface {
 
     @Inject lateinit var mMovieManager: MovieManager
     @Inject lateinit var mDatabaseManager: DatabaseManager
@@ -94,12 +96,23 @@ class MovieFragment: Fragment(), View.OnClickListener {
             configureToolbar()
             configureFab(mDatabaseManager.isMovieInDatabase(it))
 
-            mMovieManager.getTrailer(it) { trailer -> it.trailer = trailer }
+            mMovieManager.getTrailer(it) {
+                trailers_recycler_view.visibility = if (it.results?.isEmpty() == true) View.GONE else View.VISIBLE
+                trailers_title.visibility = if (it.results?.isEmpty() == true) View.GONE else View.VISIBLE
+
+                val trailersAdapter = it.results?.let { data -> context?.let { context -> TrailersAdapter(data, context) } }
+                trailers_recycler_view.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+                trailers_recycler_view.adapter = trailersAdapter
+                trailersAdapter?.trailerListener = this
+            }
         }
 
         fab?.setOnClickListener(this)
-        trailer_icon?.setOnClickListener(this)
         actors_drop_down?.setOnClickListener(this)
+    }
+
+    override fun playTrailer(url: String) {
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
     }
 
     private fun setupMovieCast(castList : List<Cast>) {
@@ -163,16 +176,6 @@ class MovieFragment: Fragment(), View.OnClickListener {
                         } else {
                             Connectivity.showNoNetworkToast(context)
                         }
-                    }
-                }
-            }
-
-            R.id.trailer_icon -> {
-                movie?.let {
-                    if (it.trailer != null) {
-                        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(it.trailer)))
-                    } else {
-                        Toast.makeText(context, "No trailer found for this movie", Toast.LENGTH_SHORT).show()
                     }
                 }
             }

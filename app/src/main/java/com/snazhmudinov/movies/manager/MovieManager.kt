@@ -7,6 +7,7 @@ import com.snazhmudinov.movies.endpoints.MoviesEndPointsInterface
 import com.snazhmudinov.movies.enum.Category
 import com.snazhmudinov.movies.models.Cast
 import com.snazhmudinov.movies.models.Movie
+import com.snazhmudinov.movies.models.Trailer
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -65,18 +66,15 @@ class MovieManager(val context: Context) {
         })
     }
 
-    fun getTrailer(movie: Movie, playTrailer: (String) -> Unit) {
+    fun getTrailer(movie: Movie, successHandler: (Trailer) -> Unit) {
         val service = retrofit.create(MoviesEndPointsInterface::class.java)
         val call = service.getYouTubeTrailer(movie.id.toString(), Constants.API_KEY)
 
         call.enqueue(callback { response, throwable ->
             response?.let {
                 if(it.isSuccessful) {
-                    val trailer = if (it.body()?.results?.isNotEmpty() == true)
-                        it.body()?.results?.get(0)?.trailerURL else null
-                    trailer?.let {
-                        playTrailer(it)
-                    }
+                    val results = it.body()
+                    results?.let(successHandler)
                 } else {
                     errorToast(it.errorBody().toString())
                 }

@@ -25,6 +25,8 @@ class Result {
     var type: String? = null
 
     val trailerURL: String
-        get() = Constants.YOUTUBE_BASE_URL + key!!
+        get() = Constants.YOUTUBE_BASE_URL + key
 
+    val trailerThumbnail: String
+        get() = "https://img.youtube.com/vi/$key/0.jpg"
 }

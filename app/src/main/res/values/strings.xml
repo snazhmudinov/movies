@@ -34,5 +34,7 @@
     <string name="permission_denied_message">Permission was denied</string>
     <string name="permission_layout_txt">Please grant storage permission to read from database</string>
     <string name="open_permission_screen">Open permission screen</string>
+    <string name="overview">overview</string>
+    <string name="trailers_and_teasers">Trailers and teasers</string>
 
 </resources>

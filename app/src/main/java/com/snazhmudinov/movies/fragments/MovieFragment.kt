@@ -15,7 +15,6 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.LinearSnapHelper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -51,14 +50,16 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
     companion object {
         private const val WRITE_PERMISSION_REQUEST = 999
 
-        fun newInstance(movie: Movie): MovieFragment {
+        fun newInstance(movie: Movie, isFavorite: Boolean): MovieFragment {
             val fragment = MovieFragment()
             fragment.movie = movie
+            fragment.isFavoriteCategory = isFavorite
             return fragment
         }
     }
 
     private var movie: Movie? = null
+    private var isFavoriteCategory = false
     private var movieListListener: MovieListInterface? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,12 +77,20 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (movie == null) { movie = activity?.intent?.getParcelableExtra(Constants.MOVIE_KEY) }
+        if (movie == null) {
+            movie = activity?.intent?.getParcelableExtra(Constants.MOVIE_KEY)
+            movie?.let { movie ->
+                if (movie.savedFilePath == null && mDatabaseManager.isMovieInDatabase(movie)) {
+                    movie.savedFilePath = mDatabaseManager.getAllRecords().first { movie.id == it.id }.savedFilePath
+                }
+            }
+            isFavoriteCategory = activity?.intent?.getBooleanExtra(Constants.FAVORITE_KEY, false) ?: false
+        }
 
         movie?.let {
             toolbar_layout?.title = it.originalTitle
 
-            val posterPath = if (it.savedFilePath == null) { it.webPosterPath } else Uri.parse(it.savedFilePath)
+            val posterPath = if (isFavoriteCategory) { Uri.parse(it.savedFilePath) } else it.webPosterPath
             poster_container.setImageURI(posterPath)
 
             setFocusCropRect()
@@ -127,7 +136,7 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
         movie?.let { movie ->
             val snackbar = Snackbar.make(view!!, R.string.added_to_favorites, Snackbar.LENGTH_LONG)
             snackbar.setAction(R.string.undo) {
-                mDatabaseManager.deleteMovieFromDb(movie)
+                deleteMovieFromDB(movie)
                 configureFab(mDatabaseManager.isMovieInDatabase(movie))
             }
             snackbar.show()
@@ -153,23 +162,18 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
             R.id.fab -> {
                 movie?.let {
                     if (mDatabaseManager.isMovieInDatabase(it)) {
-                        val localImgPath = it.savedFilePath ?: ""
-                        if (localImgPath.isNotEmpty()) {
-                            if (deleteImageFromMediaStore(context, localImgPath)) {
-                                deleteMovieFromDB(it)
+                            deleteMovieFromDB(it)
 
-                                if (it.savedFilePath != null) {
-                                    val intent = Intent()
-                                    intent.putExtra(Constants.MOVIE_TO_DELETE, it)
-                                    activity?.setResult(Activity.RESULT_OK, intent)
-                                    if (movieListListener?.isMasterPaneMode() == true) {
-                                      movieListListener?.onDeleteMovie(it)
-                                    } else { activity?.finish() }
+                            if (isFavoriteCategory) {
+                                val intent = Intent()
+                                intent.putExtra(Constants.MOVIE_TO_DELETE, it)
+                                activity?.setResult(Activity.RESULT_OK, intent)
+                                if (movieListListener?.isMasterPaneMode() == true) {
+                                    movieListListener?.onDeleteMovie(it)
+                                } else {
+                                    activity?.finish()
                                 }
                             }
-                        } else {
-                            deleteMovieFromDB(it)
-                        }
                     } else {
                         if (Connectivity.isNetworkAvailable(context)) {
                             saveMovieToDB(it)
@@ -192,6 +196,11 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
     }
 
     private fun deleteMovieFromDB(movie: Movie) {
+        context?.let { context ->
+            movie.savedFilePath?.let { path ->
+                deleteImageFromMediaStore(context, path)
+            }
+        }
         mDatabaseManager.deleteMovieFromDb(movie)
         configureFab(mDatabaseManager.isMovieInDatabase(movie))
     }

@@ -6,4 +6,5 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     fresco:viewAspectRatio="0.75"
-    fresco:actualImageScaleType="fitXY" />
+    fresco:actualImageScaleType="fitXY"
+    fresco:placeholderImage="@color/default_gray"/>

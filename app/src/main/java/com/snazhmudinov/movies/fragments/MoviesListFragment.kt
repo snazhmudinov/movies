@@ -107,7 +107,7 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
         }
     }
 
-    override fun onMovieSelected(movie: Movie/*, isLocalImage: Boolean*/) {
+    override fun onMovieSelected(movie: Movie) {
         val context = context?.let { it } ?: return
 
         if (!Connectivity.isNetworkAvailable(context) && !isFavoriteCategory()) {
@@ -118,6 +118,8 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
             } else {
                 val intent = Intent(context, MovieActivity::class.java)
                 intent.putExtra(Constants.MOVIE_KEY, movie)
+                intent.putExtra(Constants.FAVORITE_KEY,
+                        currentSelection.equals(getString(R.string.favorite), true))
                 startActivityForResult(intent, Constants.DELETE_REQUEST_CODE)
             }
             movieIndex = adapter.indexOfSelectedMovie

@@ -14,6 +14,7 @@ public final class Constants {
     public static final String CATEGORY_POPULAR = "popular";
 
     public static final String MOVIE_KEY = "MOVIE_KEY";
+    public static final String FAVORITE_KEY = "FAVORITE_KEY";
     public static final String LOCAL_POSTER = "LOCAL_POSTER";
     public static final String MOVIE_TO_DELETE = "MOVIE_TO_DELETE";
 

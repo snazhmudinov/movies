@@ -97,12 +97,12 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
             configureFab(mDatabaseManager.isMovieInDatabase(it))
 
             mMovieManager.getTrailer(it) {
-                trailers_recycler_view.visibility = if (it.results?.isEmpty() == true) View.GONE else View.VISIBLE
-                trailers_title.visibility = if (it.results?.isEmpty() == true) View.GONE else View.VISIBLE
+                trailers_recycler_view?.visibility = if (it.results?.isEmpty() == true) View.GONE else View.VISIBLE
+                trailers_title?.visibility = if (it.results?.isEmpty() == true) View.GONE else View.VISIBLE
 
                 val trailersAdapter = it.results?.let { data -> context?.let { context -> TrailersAdapter(data, context) } }
-                trailers_recycler_view.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-                trailers_recycler_view.adapter = trailersAdapter
+                trailers_recycler_view?.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+                trailers_recycler_view?.adapter = trailersAdapter
                 trailersAdapter?.trailerListener = this
             }
         }

@@ -2,6 +2,7 @@ package com.snazhmudinov.movies.adapters
 
 import android.content.Context
 import android.net.Uri
+import android.support.annotation.NonNull
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -17,21 +18,19 @@ import kotlinx.android.synthetic.main.actor_rv_item.view.*
  */
 class CastAdapter(val castList : List<Cast>, val context: Context) : RecyclerView.Adapter<CastHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): CastHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CastHolder {
         val layoutInflater = LayoutInflater.from(context)
         val view = layoutInflater.inflate(R.layout.actor_rv_item, parent, false)
 
         return CastHolder(view)
     }
 
-    override fun getItemCount(): Int {
-        return castList.size
-    }
+    override fun getItemCount() = castList.size
 
-    override fun onBindViewHolder(holder: CastHolder?, position: Int) {
+    override fun onBindViewHolder(holder: CastHolder, position: Int) {
         val cast = castList[position]
-        holder?.actorName?.text = "${cast.name} as ${cast.character}"
-        holder?.actorPhoto?.setImageURI(Uri.parse(cast.profilePath))
+        holder.actorName.text = "${cast.name} as ${cast.character}"
+        holder.actorPhoto.setImageURI(Uri.parse(cast.profilePath))
     }
 }
 

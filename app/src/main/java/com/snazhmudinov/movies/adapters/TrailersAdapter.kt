@@ -21,7 +21,7 @@ class TrailersAdapter(private val data: List<Result>, private val context: Conte
 
     var trailerListener: TrailerInterface? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): TrailerViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrailerViewHolder {
         val inflater = LayoutInflater.from(context)
         val view = inflater.inflate(R.layout.trailer_view, parent, false)
 
@@ -30,9 +30,9 @@ class TrailersAdapter(private val data: List<Result>, private val context: Conte
 
     override fun getItemCount() = data.size
 
-    override fun onBindViewHolder(holder: TrailerViewHolder?, position: Int) {
+    override fun onBindViewHolder(holder: TrailerViewHolder, position: Int) {
         val thumbnailUri = Uri.parse(data[position].trailerThumbnail)
-        val simpleDraweeView = holder?.itemView?.findViewById<SimpleDraweeView>(R.id.trailer_thumbnail)
+        val simpleDraweeView = holder.itemView?.findViewById<SimpleDraweeView>(R.id.trailer_thumbnail)
         simpleDraweeView?.setImageURI(thumbnailUri)
     }
 

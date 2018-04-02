@@ -68,7 +68,7 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        StateSaver.saveInstanceState(this, outState as Bundle)
+        StateSaver.saveInstanceState(this, outState)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =

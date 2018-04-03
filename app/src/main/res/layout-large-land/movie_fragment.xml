@@ -22,16 +22,6 @@
                 android:layout_height="350dp"
                 fresco:actualImageScaleType="focusCrop" />
 
-            <ImageView
-                android:id="@+id/trailer_icon"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                app:srcCompat="@drawable/ic_play_circle"
-                app:layout_constraintEnd_toEndOf="@+id/guideline3"
-                app:layout_constraintStart_toStartOf="@+id/guideline3"
-                app:layout_constraintTop_toTopOf="@+id/guideline4"
-                app:layout_constraintBottom_toBottomOf="@+id/guideline4" />
-
             <android.support.constraint.Guideline
                 android:id="@+id/guideline3"
                 android:layout_width="wrap_content"

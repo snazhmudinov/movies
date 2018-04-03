@@ -30,14 +30,8 @@
                 android:id="@+id/poster_container"
                 android:layout_width="match_parent"
                 android:layout_height="350dp"
-                fresco:actualImageScaleType="focusCrop"/>
-
-            <ImageView
-                android:id="@+id/trailer_icon"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                app:srcCompat="@drawable/ic_play_circle"
-                android:layout_gravity="center"/>
+                fresco:actualImageScaleType="focusCrop"
+                app:placeholderImage="@color/default_gray"/>
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/movie_toolbar"

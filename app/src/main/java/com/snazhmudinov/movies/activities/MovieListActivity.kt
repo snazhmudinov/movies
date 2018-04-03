@@ -115,8 +115,9 @@ class MovieListActivity : AppCompatActivity(),
     override fun isMasterPaneMode() = movie_fragment_container != null
 
     override fun loadMovie(movie: Movie) {
+        val isFavorite = moviesListFragment?.currentSelection.equals(getString(R.string.favorite), true)
         supportFragmentManager.beginTransaction()
-                .replace(R.id.movie_fragment_container, MovieFragment.newInstance(movie))
+                .replace(R.id.movie_fragment_container, MovieFragment.newInstance(movie, isFavorite))
                 .commit()
     }
 

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="3dp"
-    android:background="?android:attr/selectableItemBackground">
+    android:background="@android:color/white">
 
     <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/poster"

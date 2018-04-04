@@ -98,9 +98,9 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
                 list -> setupMovieCast(list)
 
                 //Set movie overview only after the actors were fetched
-                movie_description.text = it.overview
-                average_vote.text = "${it.averageVote}/10"
-                overview_rating_container.visibility = View.VISIBLE
+                movie_description?.text = it.overview
+                average_vote?.text = "${it.averageVote}/10"
+                overview_rating_container?.visibility = View.VISIBLE
             }
             configureToolbar()
             configureFab(mDatabaseManager.isMovieInDatabase(it))
@@ -152,7 +152,7 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
 
     private fun configureFab(isAdded: Boolean) {
         val resId =  if(isAdded) R.drawable.ic_clear else R.drawable.ic_add
-        fab.setImageResource(resId)
+        fab?.setImageResource(resId)
     }
 
     override fun onClick(v: View?) {

@@ -91,7 +91,7 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
             toolbar_layout?.title = it.originalTitle
 
             val posterPath = if (isFavoriteCategory) { Uri.parse(it.savedFilePath) } else it.webPosterPath
-            poster_container.setImageURI(posterPath)
+            poster_container.setImageURI(posterPath, context)
 
             setFocusCropRect()
             mMovieManager.getCast(it) {

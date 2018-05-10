@@ -33,7 +33,7 @@ class TrailersAdapter(private val data: List<Result>, private val context: Conte
     override fun onBindViewHolder(holder: TrailerViewHolder, position: Int) {
         val thumbnailUri = Uri.parse(data[position].trailerThumbnail)
         val simpleDraweeView = holder.itemView?.findViewById<SimpleDraweeView>(R.id.trailer_thumbnail)
-        simpleDraweeView?.setImageURI(thumbnailUri)
+        simpleDraweeView?.setImageURI(thumbnailUri, context)
     }
 
 

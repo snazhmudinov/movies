@@ -30,7 +30,7 @@ class CastAdapter(val castList : List<Cast>, val context: Context) : RecyclerVie
     override fun onBindViewHolder(holder: CastHolder, position: Int) {
         val cast = castList[position]
         holder.actorName.text = "${cast.name} as ${cast.character}"
-        holder.actorPhoto.setImageURI(Uri.parse(cast.profilePath))
+        holder.actorPhoto.setImageURI(cast.profilePath, context)
     }
 }
 

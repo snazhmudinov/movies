@@ -1,14 +1,13 @@
 package com.snazhmudinov.movies.adapters
 
 import android.content.Context
-import android.net.Uri
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.facebook.drawee.view.SimpleDraweeView
 import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.models.Result
+import kotlinx.android.synthetic.main.trailer_view.view.*
 
 /**
  * Created by snazhmudinov on 3/5/18.
@@ -31,18 +30,20 @@ class TrailersAdapter(private val data: List<Result>, private val context: Conte
     override fun getItemCount() = data.size
 
     override fun onBindViewHolder(holder: TrailerViewHolder, position: Int) {
-        val thumbnailUri = Uri.parse(data[position].trailerThumbnail)
-        val simpleDraweeView = holder.itemView?.findViewById<SimpleDraweeView>(R.id.trailer_thumbnail)
-        simpleDraweeView?.setImageURI(thumbnailUri, context)
+        holder.bindTrailer(data[position])
     }
 
 
-    inner class TrailerViewHolder(view: View): RecyclerView.ViewHolder(view) {
+    inner class TrailerViewHolder(private val view: View): RecyclerView.ViewHolder(view) {
         init {
             view.setOnClickListener {
                 val url = data[adapterPosition].trailerURL
                 trailerListener?.playTrailer(url)
             }
+        }
+
+        fun bindTrailer(trailer: Result) {
+            view.trailer_thumbnail.setImageURI(trailer.trailerThumbnail, context)
         }
     }
 }

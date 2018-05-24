@@ -1,14 +1,10 @@
 package com.snazhmudinov.movies.adapters
 
 import android.content.Context
-import android.net.Uri
-import android.support.annotation.NonNull
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import com.facebook.drawee.view.SimpleDraweeView
 import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.models.Cast
 import kotlinx.android.synthetic.main.actor_rv_item.view.*
@@ -29,12 +25,14 @@ class CastAdapter(val castList : List<Cast>, val context: Context) : RecyclerVie
 
     override fun onBindViewHolder(holder: CastHolder, position: Int) {
         val cast = castList[position]
-        holder.actorName.text = "${cast.name} as ${cast.character}"
-        holder.actorPhoto.setImageURI(cast.profilePath, context)
+        holder.bindCast(cast)
     }
 }
 
-class CastHolder(item:View) : RecyclerView.ViewHolder(item) {
-    var actorPhoto: SimpleDraweeView = item.actor_photo
-    var actorName: TextView = item.actor_name
+class CastHolder(private val item:View) : RecyclerView.ViewHolder(item) {
+
+    fun bindCast(cast: Cast) {
+        item.actor_photo.setImageURI(cast.profilePath, item.context)
+        item.actor_name.text = "${cast.name} as ${cast.character}"
+    }
 }

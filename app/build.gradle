@@ -37,7 +37,11 @@ android {
 }
 
 ext {
-    supportLibraryVersion = '27.1.0'
+    supportLibraryVersion = '27.1.1'
+}
+
+kapt {
+    generateStubs = true
 }
 
 dependencies {
@@ -50,7 +54,7 @@ dependencies {
     implementation "com.android.support:cardview-v7:$supportLibraryVersion"
     implementation "com.android.support:design:$supportLibraryVersion"
 
-    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     implementation 'com.google.code.gson:gson:2.8.0'
     testImplementation 'junit:junit:4.12'
@@ -62,16 +66,15 @@ dependencies {
         transitive = true;
     }
     implementation 'org.jetbrains.anko:anko-sqlite:0.10.0'
-    implementation 'com.evernote:android-state:1.1.5'
-    kapt 'com.evernote:android-state-processor:1.1.5'
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.evernote:android-state:1.2.1'
+    kapt 'com.evernote:android-state-processor:1.2.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+
+    implementation 'androidx.core:core-ktx:0.3'
 }
 
 repositories {
     mavenCentral()
     maven { url 'https://maven.fabric.io/public' }
-    maven {
-        url 'https://maven.google.com/'
-        name 'Google'
-    }
+    google()
 }

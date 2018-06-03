@@ -46,7 +46,7 @@ class MoviesAdapter(private val moviesList: List<Movie>, private val mContext: C
         val uri = if (currentMovie.savedFilePath == null) { Uri.parse(Constants.POSTER_BASE_URL + currentMovie.posterPath) }
                     else { Uri.parse(currentMovie.savedFilePath) }
 
-        holder.itemView.poster.setImageURI(uri)
+        holder.itemView.poster.setImageURI(uri, mContext)
         holder.itemView.movie_title?.text = currentMovie.originalTitle
         holder.itemView.additional_info?.text = formatMovieDate(currentMovie)
 

@@ -21,7 +21,6 @@ import android.view.ViewGroup
 import android.widget.Toast
 import com.snazhmudinov.movies.MovieListInterface
 import com.snazhmudinov.movies.R
-import com.snazhmudinov.movies.activities.MovieListActivity
 import com.snazhmudinov.movies.adapters.CastAdapter
 import com.snazhmudinov.movies.adapters.TrailersAdapter
 import com.snazhmudinov.movies.application.MovieApplication
@@ -61,7 +60,7 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
 
     private var movie: Movie? = null
     private var isFavoriteCategory = false
-    private var movieListListener: MovieListInterface? = null
+    private var movieListListener: WeakReference<MovieListInterface>? = null
     private var contextRef: WeakReference<Context>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,10 +71,8 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
     override fun onAttach(context: Context?) {
         super.onAttach(context)
 
-        movieListListener = context as? MovieListActivity
-        context?.let {
-            contextRef = WeakReference(it)
-        }
+        movieListListener = WeakReference<MovieListInterface>(context as? MovieListInterface)
+        context?.let { ctx -> contextRef = WeakReference(ctx) }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
@@ -176,8 +173,8 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
                                 val intent = Intent()
                                 intent.putExtra(Constants.MOVIE_TO_DELETE, it)
                                 activity?.setResult(Activity.RESULT_OK, intent)
-                                if (movieListListener?.isMasterPaneMode() == true) {
-                                    movieListListener?.onDeleteMovie(it)
+                                if (movieListListener?.get()?.isMasterPaneMode() == true) {
+                                    movieListListener?.get()?.onDeleteMovie(it)
                                 } else {
                                     activity?.finish()
                                 }
@@ -274,11 +271,11 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
                     dialog.dismiss()
                     context.openPermissionScreen()
                 }
-                .setNegativeButton(android.R.string.cancel, { dialog, _ -> dialog.dismiss() })
+                .setNegativeButton(android.R.string.cancel) { dialog, _ -> dialog.dismiss() }
 
         builder.create().show()
     }
 
     private fun isWritePermissionGranted() =
-            ContextCompat.checkSelfPermission(activity!!, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+            contextRef?.get()?.let { ContextCompat.checkSelfPermission(it, Manifest.permission.WRITE_EXTERNAL_STORAGE) } == PackageManager.PERMISSION_GRANTED
 }

@@ -37,6 +37,7 @@ import kotlinx.android.synthetic.main.movie_content.*
 import kotlinx.android.synthetic.main.movie_fragment.*
 import kotlinx.android.synthetic.main.rating_view.*
 import org.jetbrains.anko.runOnUiThread
+import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 /**
@@ -61,6 +62,7 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
     private var movie: Movie? = null
     private var isFavoriteCategory = false
     private var movieListListener: MovieListInterface? = null
+    private var contextRef: WeakReference<Context>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,7 +71,11 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
+
         movieListListener = context as? MovieListActivity
+        context?.let {
+            contextRef = WeakReference(it)
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
@@ -78,20 +84,22 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (movie == null) {
+
             movie = activity?.intent?.getParcelableExtra(Constants.MOVIE_KEY)
+            isFavoriteCategory = activity?.intent?.getBooleanExtra(Constants.FAVORITE_KEY, false) ?: false
+
             movie?.let { movie ->
                 if (movie.savedFilePath == null && mDatabaseManager.isMovieInDatabase(movie)) {
                     movie.savedFilePath = mDatabaseManager.getAllRecords().first { movie.id == it.id }.savedFilePath
                 }
             }
-            isFavoriteCategory = activity?.intent?.getBooleanExtra(Constants.FAVORITE_KEY, false) ?: false
         }
 
         movie?.let {
             toolbar_layout?.title = it.originalTitle
 
             val posterPath = if (isFavoriteCategory) { Uri.parse(it.savedFilePath) } else it.webPosterPath
-            poster_container.setImageURI(posterPath, context)
+            poster_container.setImageURI(posterPath, contextRef?.get())
 
             setFocusCropRect()
             mMovieManager.getCast(it) {
@@ -109,8 +117,10 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
                 trailers_recycler_view?.visibility = if (it.results?.isEmpty() == true) View.GONE else View.VISIBLE
                 trailers_title?.visibility = if (it.results?.isEmpty() == true) View.GONE else View.VISIBLE
 
-                val trailersAdapter = it.results?.let { data -> context?.let { context -> TrailersAdapter(data, context) } }
-                trailers_recycler_view?.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+                val trailersAdapter = it.results?.let { data ->
+                    TrailersAdapter(data, contextRef?.get() ?: return@getTrailer)
+                }
+                trailers_recycler_view?.layoutManager = LinearLayoutManager(contextRef?.get(), LinearLayoutManager.HORIZONTAL, false)
                 trailers_recycler_view?.adapter = trailersAdapter
                 trailersAdapter?.trailerListener = this
             }
@@ -125,11 +135,9 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
     }
 
     private fun setupMovieCast(castList : List<Cast>) {
-        context?.let {
-            cast_recycler_view.layoutManager = LinearLayoutManager(it)
-            val castAdapter = CastAdapter(castList, it)
-            cast_recycler_view.adapter = castAdapter
-        }
+        cast_recycler_view.layoutManager = LinearLayoutManager(contextRef?.get())
+        val castAdapter = CastAdapter(castList, contextRef?.get() ?: return)
+        cast_recycler_view.adapter = castAdapter
     }
 
     private fun displaySnackbar() {
@@ -156,7 +164,7 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
     }
 
     override fun onClick(v: View?) {
-        val context = context?.let { it } ?: return
+        val context = contextRef?.get() ?: return
 
         when(v?.id) {
             R.id.fab -> {
@@ -196,11 +204,12 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
     }
 
     private fun deleteMovieFromDB(movie: Movie) {
-        context?.let { context ->
-            movie.savedFilePath?.let { path ->
-                deleteImageFromMediaStore(context, path)
-            }
+        val context = contextRef?.get() ?: return
+
+        movie.savedFilePath?.let { path ->
+            deleteImageFromMediaStore(context, path)
         }
+
         mDatabaseManager.deleteMovieFromDb(movie)
         configureFab(mDatabaseManager.isMovieInDatabase(movie))
     }
@@ -211,7 +220,7 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
     }
 
     private fun saveMovieToDB(movie: Movie) {
-        val context = context?.let { it } ?: return
+        val context = contextRef?.get() ?: return
 
         if (isWritePermissionGranted()) {
             context.runOnUiThread {
@@ -256,15 +265,15 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
     }
 
     private fun showPermissionDialog() {
-        val context = context?.let { it } ?: return
+        val context = contextRef?.get() ?: return
 
         val builder = AlertDialog.Builder(context)
                 .setTitle(R.string.permission_dialog_title)
                 .setMessage(R.string.permission_dialog_message)
-                .setPositiveButton(android.R.string.ok, { dialog, _ ->
+                .setPositiveButton(android.R.string.ok) { dialog, _ ->
                     dialog.dismiss()
                     context.openPermissionScreen()
-                })
+                }
                 .setNegativeButton(android.R.string.cancel, { dialog, _ -> dialog.dismiss() })
 
         builder.create().show()

@@ -26,7 +26,8 @@ class MovieManager(val context: Context) {
                 .build()
     }
 
-    private fun <T> callback(func: (Response<T>?, Throwable?) -> Unit): Callback<T> {
+    @PublishedApi
+    internal fun <T> callback(func: (Response<T>?, Throwable?) -> Unit): Callback<T> {
         return object : Callback<T> {
             override fun onFailure(call: Call<T>?, t: Throwable?) {
                 func(null, t)
@@ -38,7 +39,7 @@ class MovieManager(val context: Context) {
         }
     }
 
-    fun getCast(movie: Movie, setupCast: (MutableList<Cast>) -> Unit) {
+    inline fun getCast(movie: Movie, crossinline setupCast: (MutableList<Cast>) -> Unit) {
         val service = retrofit.create(MoviesEndPointsInterface::class.java)
         val call = service.getCastList(movie.id.toString(), Constants.API_KEY)
 
@@ -66,7 +67,7 @@ class MovieManager(val context: Context) {
         })
     }
 
-    fun getTrailer(movie: Movie, successHandler: (Trailer) -> Unit) {
+    inline fun getTrailer(movie: Movie, crossinline successHandler: (Trailer) -> Unit) {
         val service = retrofit.create(MoviesEndPointsInterface::class.java)
         val call = service.getYouTubeTrailer(movie.id.toString(), Constants.API_KEY)
 
@@ -86,7 +87,7 @@ class MovieManager(val context: Context) {
         })
     }
 
-    fun getMovies(category: String, setupMovies: (MutableList<Movie>) -> Unit, fetchSavedMovies: () -> Unit) {
+    inline fun getMovies(category: String, crossinline setupMovies: (MutableList<Movie>) -> Unit, fetchSavedMovies: () -> Unit) {
         if (category == Category.favorite.name) {
             fetchSavedMovies()
         } else {
@@ -112,6 +113,7 @@ class MovieManager(val context: Context) {
         }
     }
 
-    private fun errorToast(message : String?)  { Toast.makeText(context, message, Toast.LENGTH_SHORT).show() }
+    @PublishedApi
+    internal fun errorToast(message : String?)  { Toast.makeText(context, message, Toast.LENGTH_SHORT).show() }
 }
 

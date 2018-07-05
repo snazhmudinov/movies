@@ -7,6 +7,7 @@ import com.snazhmudinov.movies.components.AppComponents
 import com.snazhmudinov.movies.components.DaggerAppComponents
 import com.snazhmudinov.movies.modules.DatabaseModule
 import com.snazhmudinov.movies.modules.MovieModule
+import com.squareup.leakcanary.LeakCanary
 import io.fabric.sdk.android.Fabric
 
 
@@ -28,5 +29,13 @@ class MovieApplication: Application() {
         super.onCreate()
         Fabric.with(this, Crashlytics())
         Fresco.initialize(this)
+
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            // This process is dedicated to LeakCanary for heap analysis.
+            // You should not init your app in this process.
+            return
+        }
+
+        LeakCanary.install(this)
     }
 }

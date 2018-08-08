@@ -32,6 +32,7 @@ import com.snazhmudinov.movies.manager.deleteImageFromMediaStore
 import com.snazhmudinov.movies.manager.downloadImageAndGetPath
 import com.snazhmudinov.movies.models.Cast
 import com.snazhmudinov.movies.models.Movie
+import com.snazhmudinov.movies.modules.GlideApp
 import kotlinx.android.synthetic.main.movie_content.*
 import kotlinx.android.synthetic.main.movie_fragment.*
 import kotlinx.android.synthetic.main.rating_view.*
@@ -92,25 +93,24 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
             }
         }
 
-        movie?.let {
-            toolbar_layout?.title = it.originalTitle
+        movie?.let { movie ->
+            toolbar_layout?.title = movie.originalTitle
 
-            val posterPath = if (isFavoriteCategory) { Uri.parse(it.savedFilePath) } else it.webPosterPath
-            poster_container.setImageURI(posterPath, contextRef?.get())
+            val posterPath = if (isFavoriteCategory) { Uri.parse(movie.savedFilePath) } else movie.webPosterPath
+            GlideApp.with(view.context).load(posterPath).into(poster_container)
 
-            setFocusCropRect()
-            mMovieManager.getCast(it) {
+            mMovieManager.getCast(movie) {
                 list -> setupMovieCast(list)
 
                 //Set movie overview only after the actors were fetched
-                movie_description?.text = it.overview
-                average_vote?.text = "${it.averageVote}/10"
+                movie_description?.text = movie.overview
+                average_vote?.text = "${movie.averageVote}/10"
                 overview_rating_container?.visibility = View.VISIBLE
             }
             configureToolbar()
-            configureFab(mDatabaseManager.isMovieInDatabase(it))
+            configureFab(mDatabaseManager.isMovieInDatabase(movie))
 
-            mMovieManager.getTrailer(it) {
+            mMovieManager.getTrailer(movie) {
                 trailers_recycler_view?.visibility = if (it.results?.isEmpty() == true) View.GONE else View.VISIBLE
                 trailers_title?.visibility = if (it.results?.isEmpty() == true) View.GONE else View.VISIBLE
 
@@ -209,11 +209,6 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
 
         mDatabaseManager.deleteMovieFromDb(movie)
         configureFab(mDatabaseManager.isMovieInDatabase(movie))
-    }
-
-    private fun setFocusCropRect() {
-        val point = PointF(0.5f, 0f)
-        poster_container.hierarchy.setActualImageFocusPoint(point)
     }
 
     private fun saveMovieToDB(movie: Movie) {

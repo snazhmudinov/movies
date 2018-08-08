@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.models.Result
+import com.snazhmudinov.movies.modules.GlideApp
 import kotlinx.android.synthetic.main.trailer_view.view.*
 
 /**
@@ -43,7 +44,7 @@ class TrailersAdapter(private val data: List<Result>, private val context: Conte
         }
 
         fun bindTrailer(trailer: Result) {
-            view.trailer_thumbnail.setImageURI(trailer.trailerThumbnail, context)
+            GlideApp.with(view).load(trailer.trailerThumbnail).into( view.trailer_thumbnail)
         }
     }
 }

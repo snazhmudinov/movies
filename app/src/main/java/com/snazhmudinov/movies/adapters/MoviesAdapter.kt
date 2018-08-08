@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.constans.Constants
 import com.snazhmudinov.movies.models.Movie
+import com.snazhmudinov.movies.modules.GlideApp
 import kotlinx.android.synthetic.main.movie_rv_item_list.view.*
 import java.text.DateFormatSymbols
 
@@ -46,7 +47,7 @@ class MoviesAdapter(private val moviesList: List<Movie>, private val mContext: C
         val uri = if (currentMovie.savedFilePath == null) { Uri.parse(Constants.POSTER_BASE_URL + currentMovie.posterPath) }
                     else { Uri.parse(currentMovie.savedFilePath) }
 
-        holder.itemView.poster.setImageURI(uri, mContext)
+        GlideApp.with(mContext).load(uri).into(holder.itemView.poster)
         holder.itemView.movie_title?.text = currentMovie.originalTitle
         holder.itemView.additional_info?.text = formatMovieDate(currentMovie)
 

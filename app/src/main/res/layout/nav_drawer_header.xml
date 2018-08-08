@@ -1,16 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:fresco="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/imageView"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
-    <com.facebook.drawee.view.SimpleDraweeView
-        android:id="@+id/imageView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        fresco:backgroundImage="@drawable/movie_popcorn"
-        fresco:viewAspectRatio="1.77"
-        fresco:actualImageScaleType="centerCrop"/>
-
-</LinearLayout>
+    android:layout_height="wrap_content"
+    android:adjustViewBounds="true"
+    android:src="@drawable/movie_popcorn" />

@@ -97,10 +97,12 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
         adapter = MoviesAdapter(dataset, context, movieListListener?.isMasterPaneMode() == true)
         toggleEmptyView(isReadPermissionGranted() && dataset.isEmpty())
         togglePermissionScreen()
-        adapter.let {
-            it.movieInterface = this
-            moviesRecyclerView.adapter = it
-            it.indexOfSelectedMovie = movieIndex
+
+        adapter.apply {
+            movieInterface = this@MoviesListFragment
+            moviesRecyclerView.adapter = this
+            indexOfSelectedMovie = movieIndex
+
             if (movieListListener?.isMasterPaneMode() == true && dataset.isNotEmpty()) {
                 movieListListener?.loadMovie(dataset[movieIndex])
             }

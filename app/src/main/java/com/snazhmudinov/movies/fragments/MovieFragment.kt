@@ -32,6 +32,7 @@ import com.snazhmudinov.movies.manager.deleteImageFromMediaStore
 import com.snazhmudinov.movies.manager.downloadImageAndGetPath
 import com.snazhmudinov.movies.models.Cast
 import com.snazhmudinov.movies.models.Movie
+import com.snazhmudinov.movies.modules.GlideApp
 import kotlinx.android.synthetic.main.movie_content.*
 import kotlinx.android.synthetic.main.movie_fragment.*
 import kotlinx.android.synthetic.main.rating_view.*
@@ -96,9 +97,8 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
             toolbar_layout?.title = it.originalTitle
 
             val posterPath = if (isFavoriteCategory) { Uri.parse(it.savedFilePath) } else it.webPosterPath
-            poster_container.setImageURI(posterPath, contextRef?.get())
+            contextRef?.get()?.let { context -> GlideApp.with(context).load(posterPath).into(poster_container) }
 
-            setFocusCropRect()
             mMovieManager.getCast(it) {
                 list -> setupMovieCast(list)
 
@@ -209,11 +209,6 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
 
         mDatabaseManager.deleteMovieFromDb(movie)
         configureFab(mDatabaseManager.isMovieInDatabase(movie))
-    }
-
-    private fun setFocusCropRect() {
-        val point = PointF(0.5f, 0f)
-        poster_container.hierarchy.setActualImageFocusPoint(point)
     }
 
     private fun saveMovieToDB(movie: Movie) {

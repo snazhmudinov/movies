@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.snazhmudinov.movies.R
 import com.snazhmudinov.movies.models.Cast
+import com.snazhmudinov.movies.modules.GlideApp
 import kotlinx.android.synthetic.main.actor_rv_item.view.*
 
 /**
@@ -32,7 +33,7 @@ class CastAdapter(val castList : List<Cast>, val context: Context) : RecyclerVie
 class CastHolder(private val item:View) : RecyclerView.ViewHolder(item) {
 
     fun bindCast(cast: Cast) {
-        item.actor_photo.setImageURI(cast.profilePath, item.context)
+        GlideApp.with(item).load(cast.profilePath).into(item.actor_photo)
         item.actor_name.text = "${cast.name} as ${cast.character}"
     }
 }

@@ -114,12 +114,15 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
             Connectivity.showNoNetworkToast(context)
         } else {
             if (movieListListener?.isMasterPaneMode() == true) {
-                if (movieIndex != dataset.indexOf(movie)) { movieListListener?.loadMovie(movie) }
+                if (movieIndex != dataset.indexOf(movie)) {
+                    movieListListener?.loadMovie(movie)
+                }
             } else {
-                val intent = Intent(context, MovieActivity::class.java)
-                intent.putExtra(Constants.MOVIE_KEY, movie)
-                intent.putExtra(Constants.FAVORITE_KEY,
-                        currentSelection.equals(getString(R.string.favorite), true))
+                val intent = Intent(context, MovieActivity::class.java).apply {
+                    putExtra(Constants.MOVIE_KEY, movie)
+                    putExtra(Constants.FAVORITE_KEY,
+                            currentSelection.equals(getString(R.string.favorite), true))
+                }
                 startActivityForResult(intent, Constants.DELETE_REQUEST_CODE)
             }
             movieIndex = adapter.indexOfSelectedMovie

@@ -12,6 +12,7 @@
     <string name="added_to_favorites">Added to favorites</string>
     <string name="undo">Undo</string>
     <string name="actors_title">Actors</string>
+    <string name="rating_placeholder">%1$.1f/10</string>
 
     <!-- Categories -->
     <string name="popular">Popular</string>

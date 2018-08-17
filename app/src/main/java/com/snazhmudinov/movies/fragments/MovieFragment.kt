@@ -96,25 +96,33 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
         movie?.let {
             toolbar_layout?.title = it.originalTitle
 
-            val posterPath = if (isFavoriteCategory) { Uri.parse(it.savedFilePath) } else it.webPosterPath
-            contextRef?.get()?.let { context -> GlideApp.with(context).load(posterPath).into(poster_container) }
+            val posterPath = if (isFavoriteCategory) {
+                Uri.parse(it.savedFilePath)
+            } else it.webPosterPath
 
-            mMovieManager.getCast(it) {
-                list -> setupMovieCast(list)
+            contextRef?.get()?.let { context ->
+                GlideApp.with(context)
+                        .load(posterPath)
+                        .centerCrop()
+                        .into(poster_container)
+            }
+
+            mMovieManager.getCast(it) { list ->
+                setupMovieCast(list)
 
                 //Set movie overview only after the actors were fetched
                 movie_description?.text = it.overview
-                average_vote?.text = "${it.averageVote}/10"
+                average_vote?.text = getString(R.string.rating_placeholder, it.averageVote)
                 overview_rating_container?.visibility = View.VISIBLE
             }
             configureToolbar()
             configureFab(mDatabaseManager.isMovieInDatabase(it))
 
-            mMovieManager.getTrailer(it) {
-                trailers_recycler_view?.visibility = if (it.results?.isEmpty() == true) View.GONE else View.VISIBLE
-                trailers_title?.visibility = if (it.results?.isEmpty() == true) View.GONE else View.VISIBLE
+            mMovieManager.getTrailer(it) { trailer ->
+                trailers_recycler_view?.visibility = if (trailer.results?.isEmpty() == true) View.GONE else View.VISIBLE
+                trailers_title?.visibility = if (trailer.results?.isEmpty() == true) View.GONE else View.VISIBLE
 
-                val trailersAdapter = it.results?.let { data ->
+                val trailersAdapter = trailer.results?.let { data ->
                     TrailersAdapter(data, contextRef?.get() ?: return@getTrailer)
                 }
                 trailers_recycler_view?.layoutManager = LinearLayoutManager(contextRef?.get(), LinearLayoutManager.HORIZONTAL, false)
@@ -132,9 +140,12 @@ class MovieFragment: Fragment(), View.OnClickListener, TrailersAdapter.TrailerIn
     }
 
     private fun setupMovieCast(castList : List<Cast>) {
-        cast_recycler_view.layoutManager = LinearLayoutManager(contextRef?.get())
         val castAdapter = CastAdapter(castList, contextRef?.get() ?: return)
-        cast_recycler_view.adapter = castAdapter
+
+        cast_recycler_view?.apply {
+            layoutManager = LinearLayoutManager(contextRef?.get())
+            adapter = castAdapter
+        }
     }
 
     private fun displaySnackbar() {

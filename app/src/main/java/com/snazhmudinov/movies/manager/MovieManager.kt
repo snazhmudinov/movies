@@ -13,6 +13,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import kotlin.math.min
 
 /**
  * Created by snazhmudinov on 10/1/17.
@@ -44,21 +45,17 @@ class MovieManager(val context: Context) {
         val call = service.getCastList(movie.id.toString(), Constants.API_KEY)
 
         call.enqueue(callback { response, throwable ->
-            response?.let {
-                if (it.isSuccessful) {
-                    val actors = it.body()?.castList
-                    if (actors?.isNotEmpty() == true) {
-                        setupCast(
-                                if (actors.size > 5) {
-                                    actors.subList(0, 5)
-                                } else {
-                                    actors
-                                }
-                        )
-                    }
-                } else {
-                    errorToast(response.errorBody().toString())
+
+            if (response?.isSuccessful == true) {
+                val actors = response.body()?.castList ?: return@callback
+                val filteredActors = actors.subList(0, min(actors.size, 5))
+
+                if (filteredActors.isNotEmpty()) {
+                    setupCast(filteredActors)
                 }
+
+            } else {
+                errorToast(response?.errorBody().toString())
             }
 
             throwable?.let {
@@ -72,13 +69,12 @@ class MovieManager(val context: Context) {
         val call = service.getYouTubeTrailer(movie.id.toString(), Constants.API_KEY)
 
         call.enqueue(callback { response, throwable ->
-            response?.let {
-                if(it.isSuccessful) {
-                    val results = it.body()
-                    results?.let(successHandler)
-                } else {
-                    errorToast(it.errorBody().toString())
-                }
+
+            if (response?.isSuccessful == true) {
+                val trailers = response.body() ?: return@callback
+                successHandler(trailers)
+            } else {
+                errorToast(response?.errorBody().toString())
             }
 
             throwable?.let {
@@ -95,15 +91,12 @@ class MovieManager(val context: Context) {
             val call = service.getMovies(category, Constants.API_KEY)
 
             call.enqueue(callback { response, throwable ->
-                response?.let {
-                    if (it.isSuccessful) {
-                        val movies = it.body()?.results
-                        movies?.let {
-                            setupMovies(it)
-                        }
-                    } else {
-                        errorToast(it.errorBody().toString())
-                    }
+
+                if (response?.isSuccessful == true) {
+                    val movies = response.body() ?: return@callback
+                    setupMovies(movies.results)
+                } else {
+                    errorToast(response?.errorBody()?.toString())
                 }
 
                 throwable?.let {
@@ -114,6 +107,8 @@ class MovieManager(val context: Context) {
     }
 
     @PublishedApi
-    internal fun errorToast(message : String?)  { Toast.makeText(context, message, Toast.LENGTH_SHORT).show() }
+    internal fun errorToast(message: String?) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
 }
 

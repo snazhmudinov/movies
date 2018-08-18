@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.PointF
 import android.net.Uri
 import android.os.Bundle
 import android.support.design.widget.Snackbar
@@ -27,6 +26,7 @@ import com.snazhmudinov.movies.application.MovieApplication
 import com.snazhmudinov.movies.connectivity.Connectivity
 import com.snazhmudinov.movies.constans.Constants
 import com.snazhmudinov.movies.database.DatabaseManager
+import com.snazhmudinov.movies.extensions.openPermissionScreen
 import com.snazhmudinov.movies.manager.MovieManager
 import com.snazhmudinov.movies.manager.deleteImageFromMediaStore
 import com.snazhmudinov.movies.manager.downloadImageAndGetPath

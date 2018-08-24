@@ -5,9 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.GridLayoutManager
@@ -27,6 +25,7 @@ import com.snazhmudinov.movies.connectivity.Connectivity
 import com.snazhmudinov.movies.constans.Constants
 import com.snazhmudinov.movies.database.DatabaseManager
 import com.snazhmudinov.movies.enum.Category
+import com.snazhmudinov.movies.extensions.openPermissionScreen
 import com.snazhmudinov.movies.manager.MovieManager
 import com.snazhmudinov.movies.models.Movie
 import kotlinx.android.synthetic.main.fragment_movies_list.*
@@ -114,12 +113,15 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
             Connectivity.showNoNetworkToast(context)
         } else {
             if (movieListListener?.isMasterPaneMode() == true) {
-                if (movieIndex != dataset.indexOf(movie)) { movieListListener?.loadMovie(movie) }
+                if (movieIndex != dataset.indexOf(movie)) {
+                    movieListListener?.loadMovie(movie)
+                }
             } else {
-                val intent = Intent(context, MovieActivity::class.java)
-                intent.putExtra(Constants.MOVIE_KEY, movie)
-                intent.putExtra(Constants.FAVORITE_KEY,
-                        currentSelection.equals(getString(R.string.favorite), true))
+                val intent = Intent(context, MovieActivity::class.java).apply {
+                    putExtra(Constants.MOVIE_KEY, movie)
+                    putExtra(Constants.FAVORITE_KEY,
+                            currentSelection.equals(getString(R.string.favorite), true))
+                }
                 startActivityForResult(intent, Constants.DELETE_REQUEST_CODE)
             }
             movieIndex = adapter.indexOfSelectedMovie
@@ -201,12 +203,4 @@ class MoviesListFragment: Fragment(), MoviesAdapter.MovieInterface {
     }
 
     private fun isFavoriteCategory() = currentSelection.equals("favorite", ignoreCase = true)
-}
-
-fun Context.openPermissionScreen() {
-    val intent = Intent()
-    intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-    val uri = Uri.fromParts("package", this.packageName, null)
-    intent.data = uri
-    startActivity(intent)
 }
